@@ -1,0 +1,3 @@
+[submodule "42"]
+	path = 42
+	url = https://github.com/ericstoneking/42.git
