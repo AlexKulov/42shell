@@ -3,6 +3,30 @@ QT -= gui
 CONFIG += console
 CONFIG -= app_bundle
 
+CONFIG += QTPLOT
+QTPLOT {
+    DEFINES += _USE_QTPLOT_
+    QT += core gui widgets
+    QT += network printsupport #for customplot
+    INCLUDEPATH +=QtSource \
+
+    SOURCES += \
+    QtSource/mainwindow.cpp \
+    QtSource/main.cpp \
+    QtSource/qcustomplot.cpp \
+
+    HEADERS += \
+    QtSource/mainwindow.h \
+    QtSource/qcustomplot.h
+
+    FORMS += \
+    QtSource/mainwindow.ui
+}
+else {
+    SOURCES += \
+    ../42/Source/42main.c \
+}
+
 CONFIG += 42GUI
 42GUI {
     DEFINES += _ENABLE_GUI_
@@ -23,7 +47,7 @@ CONFIG += 42GUI
 }
 
 
-INCLUDEPATH +=../42/Include \
+INCLUDEPATH +=../42change/Include \
               ../42/Kit/Include
 
 SOURCES += \
@@ -40,15 +64,14 @@ SOURCES += \
         ../42/Kit/Source/sphkit.c \
         ../42/Kit/Source/timekit.c \
         ../42/Source/42actuators.c \
-        ../42/Source/42cmd.c \
-        ../42/Source/42dynamics.c \
+        ../42change/Source/42cmd.c \
+        ../42change/Source/42dynamics.c \
         ../42/Source/42environs.c \
         ../42/Source/42ephem.c \
         ../42change/Source/42exec.c \
-        ../42/Source/42fsw.c \
-        ../42/Source/42init.c \
+        ../42change/Source/42fsw.c \
+        ../42change/Source/42init.c \
         ../42/Source/42ipc.c \
-        ../42/Source/42main.c \
         ../42/Source/42perturb.c \
         ../42/Source/42report.c \
         ../42/Source/42sensors.c \
@@ -59,10 +82,11 @@ SOURCES += \
         ../42/Source/IPC/SimReadFromFile.c \
         ../42/Source/IPC/SimReadFromSocket.c \
         ../42/Source/IPC/SimWriteToFile.c \
-        ../42/Source/IPC/SimWriteToSocket.c
+        ../42/Source/IPC/SimWriteToSocket.c \
+        ../cAlgorithms/simplestMode.c
 
 TEMPLATE = app
-TARGET = my42
+TARGET = 42
 
 OBJECTS_DIR = ./debug
 DESTDIR = ./../42

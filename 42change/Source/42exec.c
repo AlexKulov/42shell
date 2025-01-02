@@ -301,6 +301,9 @@ void ZeroFrcTrq(void)
       }
 }
 /**********************************************************************/
+#ifdef _USE_QTPLOT_
+    extern void ToPlot(double Time);
+#endif
 long SimStep(void)
 {
       long Isc;
@@ -365,6 +368,9 @@ long SimStep(void)
       }
       Report();  /* File Output */
 
+      #ifdef _USE_QTPLOT_
+      ToPlot(SimTime);
+      #endif
       /* Exit when Stoptime is reached */
       if (SimComplete) {
          if (TimeMode == FAST_TIME) {
