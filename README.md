@@ -8,7 +8,7 @@
 Более подробно https://github.com/ericstoneking/42
 
 ## Структура репозитория
-
+```
 -- 42shell
     |-- 42
     |   |-- Contains a origin 42 repo
@@ -17,4 +17,20 @@
     |-- 42support
     |   |-- Contains freeglut and glew library
     |   |-- Contains qt file project for build from ../42 folder
-    |-- ...
+    |-- 42InOutSimplest
+    |   |-- Like 42/InOut
+	|-- cAlgorithms
+    |   |-- Contains user on-board algorithms
+```
+
+## Предпосылки
+
+1) загрузите этот репозиторий на свой компьютер (git clone ... или Download ZIP)
+2) установите на свой компьютер Qt5. 
+При установке Qt5 обязательно добавьте компилятор MinGW 32(64)-bit
+
+## Быстрый старт
+
+1) откройте файл 42support/42.pro через Qt Creator и нажмите конопку "Настроить проект" 
+2) запустите проект на выполнение (слева внизу зелёный треугольник с жуком)
+3) на появившемся виджете нажмите кнопку "Старт"
