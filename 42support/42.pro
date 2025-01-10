@@ -43,9 +43,14 @@ CONFIG += 42GUI
     # GLWF not use in origin 42/Makefile
     #   ../42/Source/42glfw.c
 
-    LIBS += -lopengl32 -lfreeglut -lglu32 -lglew32
+    win32:{
+        LIBS += ./glew/lib/libglew32.a
+        LIBS += ./glew/lib/libglew32.dll.a
+        LIBS += ./freeglut/lib/libfreeglut.a
+        LIBS += ./freeglut/lib/libfreeglut_static.a
+        LIBS += -lopengl32 -lglu32
+    }
 }
-
 
 INCLUDEPATH +=../42change/Include \
               ../42/Kit/Include
@@ -83,6 +88,7 @@ SOURCES += \
         ../42/Source/IPC/SimReadFromSocket.c \
         ../42/Source/IPC/SimWriteToFile.c \
         ../42/Source/IPC/SimWriteToSocket.c \
+        ../cAlgorithms/ballistic.c \
         ../cAlgorithms/simplestMode.c
 
 TEMPLATE = app
@@ -91,4 +97,4 @@ TARGET = 42
 OBJECTS_DIR = ./debug
 DESTDIR = ./../42
 
-LIBS += -lws2_32
+win32: LIBS += -lws2_32

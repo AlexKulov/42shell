@@ -54,6 +54,7 @@ MainWindow::~MainWindow()
 extern "C"{
 #endif
 #include "42.h"
+#include "../cAlgorithms/ballistic.h"
 extern int exec(int argc,char **argv);
 
 void ToPlot(double Time);
@@ -61,7 +62,7 @@ void ToPlot(double Time);
 }
 #endif
 
-extern double sunAng;
+extern double modeAng;
 void ToPlot(double SimTime){
     mSimTime = SimTime;
     static unsigned int PlotSampleCounter=0;
@@ -71,7 +72,9 @@ void ToPlot(double SimTime){
     if(PlotSampleCounter>PlotMaxCounter){
         PlotSampleCounter = 0;
         if(true){
-            extUi->Plot11->graph(0)->addData(SimTime,sunAng);
+            static double angLimitR = D2R*5;
+            modeAng = Limit(modeAng, -angLimitR, angLimitR);
+            extUi->Plot11->graph(0)->addData(SimTime,R2D*modeAng);
             extUi->Plot11->rescaleAxes();
             extUi->Plot11->replot();
         }

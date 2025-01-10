@@ -247,6 +247,7 @@
 #define RBT_FSW 10
 #define SUN_FSW 11
 #define LVLH_FSW 12
+#define POINT_FSW 13
 
 /* Command Types */
 #define CMD_DIRECTION 0

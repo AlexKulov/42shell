@@ -1786,6 +1786,7 @@ void AdHocFSW(struct SCType *S)
 /**********************************************************************/
 extern void EasySunMode(struct SCType *S);
 extern void EasyLvlhMode(struct SCType *S);
+extern void PointOrientation(struct SCType *S);
 void FlightSoftWare(struct SCType *S)
 {
       #ifdef _AC_STANDALONE_
@@ -1856,6 +1857,9 @@ void FlightSoftWare(struct SCType *S)
                break;
             case LVLH_FSW:
                EasyLvlhMode(S);
+               break;
+            case POINT_FSW:
+               PointOrientation(S);
                break;
          }
          
