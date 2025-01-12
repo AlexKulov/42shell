@@ -38,7 +38,7 @@ CONFIG += 42GUI
     SOURCES += \
         ../42/Kit/Source/glkit.c \
         ../42/Source/42gl.c \
-        ../42/Source/42glut.c \
+        ../42change/Source/42glut.c \
         ../42change/Source/42gpgpu.c
     # GLWF not use in origin 42/Makefile
     #   ../42/Source/42glfw.c
@@ -88,7 +88,7 @@ SOURCES += \
         ../42/Source/IPC/SimReadFromSocket.c \
         ../42/Source/IPC/SimWriteToFile.c \
         ../42/Source/IPC/SimWriteToSocket.c \
-        ../cAlgorithms/ballistic.c \
+        ../cAlgorithms/serviceAlg.c \
         ../cAlgorithms/simplestMode.c
 
 TEMPLATE = app

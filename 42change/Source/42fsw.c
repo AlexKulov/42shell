@@ -1787,6 +1787,7 @@ void AdHocFSW(struct SCType *S)
 extern void EasySunMode(struct SCType *S);
 extern void EasyLvlhMode(struct SCType *S);
 extern void PointOrientation(struct SCType *S);
+extern void NadirMode(struct SCType *S);
 void FlightSoftWare(struct SCType *S)
 {
       #ifdef _AC_STANDALONE_
@@ -1853,14 +1854,18 @@ void FlightSoftWare(struct SCType *S)
                #endif
                break;
             case SUN_FSW:
-               EasySunMode(S);
-               break;
+                EasySunMode(S);
+                break;
             case LVLH_FSW:
-               EasyLvlhMode(S);
-               break;
+                EasyLvlhMode(S);
+                break;
             case POINT_FSW:
-               PointOrientation(S);
-               break;
+                PointOrientation(S);
+                break;
+            case NADIR_FSW:
+                NadirMode(S);
+                break;
+
          }
          
       }

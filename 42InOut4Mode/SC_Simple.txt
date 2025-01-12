@@ -27,8 +27,8 @@ NONE                        ! Shaker File Name
 ************************************************************************
 1                           ! Number of Bodies
 ================================ Body 0 ================================
-100.0                       ! Mass
-100.0  200.0  300.0         ! Moments of Inertia (kg-m^2)
+10.0                       ! Mass
+10.0  20.0  30.0         ! Moments of Inertia (kg-m^2)
 0.0  0.0  0.0               ! Products of Inertia (xy,xz,yz)
 0.0  0.0  0.0               ! Location of mass center, m
 0.0  0.0  0.0               ! Constant Embedded Momentum (Nms)
@@ -99,10 +99,32 @@ PULSED                      ! Mode (PULSED or PROPORTIONAL)
 0                           ! Body
 0                           ! Node
 ******************************* Gyro ************************************
-0                           ! Number of Gyro Axes
+3                           ! Number of Gyro Axes
 ============================== Axis 0 ===================================
 0.1                         ! Sample Time,sec
 1.0  0.0  0.0               ! Axis expressed in Body Frame
+1000.0                      ! Max Rate, deg/sec
+100.0                       ! Scale Factor Error, ppm
+1.0                         ! Quantization, arcsec 
+0.07                        ! Angle Random Walk (deg/rt-hr)
+0.1  1.0                    ! Bias Stability (deg/hr) over timespan (hr)
+0.1                         ! Angle Noise, arcsec RMS
+0.1                         ! Initial Bias (deg/hr)
+0                           ! Node
+============================== Axis 1 ===================================
+0.1                         ! Sample Time,sec
+0.0  1.0  0.0               ! Axis expressed in Body Frame
+1000.0                      ! Max Rate, deg/sec
+100.0                       ! Scale Factor Error, ppm
+1.0                         ! Quantization, arcsec 
+0.07                        ! Angle Random Walk (deg/rt-hr)
+0.1  1.0                    ! Bias Stability (deg/hr) over timespan (hr)
+0.1                         ! Angle Noise, arcsec RMS
+0.1                         ! Initial Bias (deg/hr)
+0                           ! Node
+============================== Axis 2 ===================================
+0.1                         ! Sample Time,sec
+0.0  0.0  1.0               ! Axis expressed in Body Frame
 1000.0                      ! Max Rate, deg/sec
 100.0                       ! Scale Factor Error, ppm
 1.0                         ! Quantization, arcsec 
@@ -132,17 +154,25 @@ PULSED                      ! Mode (PULSED or PROPORTIONAL)
 0                           ! Body
 0                           ! Node
 ************************* Fine Sun Sensor *******************************
-0                           ! Number of Fine Sun Sensors
+2                           ! Number of Fine Sun Sensors
 =============================== FSS 0 ===================================
 0.2                         ! Sample Time,sec
 70.0  0.0  0.0  231         ! Mounting Angles (deg), Seq in Body
 Z_AXIS                      ! Boresight Axis X_AXIS, Y_AXIS, or Z_AXIS
-32.0   32.0                 ! H, V FOV Size, deg
+90.0   90.0                 ! H, V FOV Size, deg
+0.1                         ! Noise Equivalent Angle, deg RMS
+0.5                         ! Quantization, deg
+0                           ! Node
+=============================== FSS 1 ===================================
+0.2                         ! Sample Time,sec
+-20.0  0.0  0.0  231         ! Mounting Angles (deg), Seq in Body
+Z_AXIS                      ! Boresight Axis X_AXIS, Y_AXIS, or Z_AXIS
+90.0   90.0                 ! H, V FOV Size, deg
 0.1                         ! Noise Equivalent Angle, deg RMS
 0.5                         ! Quantization, deg
 0                           ! Node
 ************************** Star Tracker *********************************
-0                           ! Number of Star Trackers
+1                           ! Number of Star Trackers
 =============================== ST 0 ====================================
 0.25                        ! Sample Time,sec
 -90.0  90.0  00.0  321      ! Mounting Angles (deg), Seq in Body

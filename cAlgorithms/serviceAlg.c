@@ -1,5 +1,5 @@
 #include "42.h"
-#include "ballistic.h"
+#include "serviceAlg.h"
 
 extern double D2R;
 /********* lat, lng reference by degree ***************/
@@ -12,7 +12,7 @@ void WSG84ToECI(double lat, double lng, double alt, double PosN[3]){
     //may be in feature be note how calc CWN
     VxM(GoalW,World[EARTH].CWN,PosN);
 }
-
+/* return radian */
 double angEarthPointNegAxis(struct SCType *S, double eartPointN[3], double bodyAxis[3]){
     double  GoalYN[3];
     long i;

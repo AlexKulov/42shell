@@ -1,15 +1,26 @@
 ************************* Fields of View ***************************
-4                                 !  Number of FOVs
+2                                 !  Number of FOVs
 --------------------------------------------------------------------
-"SOLID"                           !  Label
+"Fine Sun Sensor1"                           !  Label
 4   4.0                           !  Number of Sides, Length [m]
-8.0  4.0                          !  H Width, V Height [deg]
+90.0  90.0                          !  H Width, V Height [deg]
 0.0 1.0 0.0 0.5                   !  Color RGB+Alpha
 SOLID                             !  WIREFRAME, SOLID, VECTOR, or PLANE 
 TRUE  TRUE                        !  Draw Near Field, Draw Far Field
 0  0                              !  SC, Body 
-0.0  0.0  1.0                     !  Position in Body [m]
-0.0  0.0  0.0  321                !  Euler Angles [deg], Sequence
+0.0  0.0  0.1                     !  Position in Body [m]
+70.0  0.0  0.0  231                !  Euler Angles [deg], Sequence
+Z_AXIS                            !  Boresight Axis X_AXIS, Y_AXIS, or Z_AXIS
+--------------------------------------------------------------------
+"Fine Sun Sensor2"                           !  Label
+4   4.0                           !  Number of Sides, Length [m]
+90.0  90.0                          !  H Width, V Height [deg]
+0.0 1.0 0.0 0.5                   !  Color RGB+Alpha
+SOLID                             !  WIREFRAME, SOLID, VECTOR, or PLANE 
+TRUE  TRUE                        !  Draw Near Field, Draw Far Field
+0  0                              !  SC, Body 
+0.0  0.0  0.1                     !  Position in Body [m]
+-20.0  0.0  0.0  231                !  Euler Angles [deg], Sequence
 Z_AXIS                            !  Boresight Axis X_AXIS, Y_AXIS, or Z_AXIS
 --------------------------------------------------------------------
 "WIRE"                            !  Label

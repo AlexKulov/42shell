@@ -1,8 +1,9 @@
 <<<<<<<<<<<<<<<<<  42:  Command Script File  >>>>>>>>>>>>>>>>>
 0.0 SC[0] qrn = [0.0  0.0  0.0  1.0]
 1.0 SC[0] FswTag = SUN_FSW 
-1000.0 SC[0] FswTag = LVLH_FSW
-3500.0 SC[0] FswTag = POINT_FSW
+2000.0 SC[0] FswTag = NADIR_FSW
+3500.0 SC[0] FswTag = LVLH_FSW
+4500.0 SC[0] FswTag = POINT_FSW
 EOF
 
 ##############################################################

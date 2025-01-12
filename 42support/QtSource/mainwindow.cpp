@@ -15,6 +15,10 @@ ui(new Ui::MainWindow)
 
     ui->Plot11->addGraph();
     ui->Plot11->graph(0)->setPen(QColor(Qt::red));
+    ui->Plot11->addGraph();
+    ui->Plot11->graph(1)->setPen(QColor(Qt::green));
+    ui->Plot11->addGraph();
+    ui->Plot11->graph(2)->setPen(QColor(Qt::blue));
 
     ui->Plot12->addGraph();
     ui->Plot12->graph(0)->setPen(QColor(Qt::red));
@@ -29,6 +33,8 @@ ui(new Ui::MainWindow)
     ui->Plot13->graph(1)->setPen(QColor(Qt::green));
     ui->Plot13->addGraph();
     ui->Plot13->graph(2)->setPen(QColor(Qt::blue));
+    ui->Plot13->addGraph();
+    ui->Plot13->graph(3)->setPen(QColor(Qt::yellow));
 
     ui->Plot21->addGraph(); //plotKm
     ui->Plot21->graph(0)->setPen(QColor(Qt::red));
@@ -54,7 +60,7 @@ MainWindow::~MainWindow()
 extern "C"{
 #endif
 #include "42.h"
-#include "../cAlgorithms/ballistic.h"
+#include "../cAlgorithms/serviceAlg.h"
 extern int exec(int argc,char **argv);
 
 void ToPlot(double Time);
@@ -62,7 +68,7 @@ void ToPlot(double Time);
 }
 #endif
 
-extern double modeAng;
+extern double modeAng[3];
 void ToPlot(double SimTime){
     mSimTime = SimTime;
     static unsigned int PlotSampleCounter=0;
@@ -72,9 +78,13 @@ void ToPlot(double SimTime){
     if(PlotSampleCounter>PlotMaxCounter){
         PlotSampleCounter = 0;
         if(true){
-            static double angLimitR = D2R*5;
-            modeAng = Limit(modeAng, -angLimitR, angLimitR);
-            extUi->Plot11->graph(0)->addData(SimTime,R2D*modeAng);
+            static double angLimit = 5;
+            modeAng[0] = Limit(modeAng[0], -angLimit, angLimit);
+            extUi->Plot11->graph(0)->addData(SimTime,modeAng[0]);
+            modeAng[1] = Limit(modeAng[1], -angLimit, angLimit);
+            extUi->Plot11->graph(1)->addData(SimTime,modeAng[1]);
+            modeAng[2] = Limit(modeAng[2], -angLimit, angLimit);
+            extUi->Plot11->graph(2)->addData(SimTime,modeAng[2]);
             extUi->Plot11->rescaleAxes();
             extUi->Plot11->replot();
         }
@@ -88,9 +98,14 @@ void ToPlot(double SimTime){
         }
 
         if(true){
-            extUi->Plot13->graph(0)->addData(SimTime,SC[0].Whl[0].Trq);
-            extUi->Plot13->graph(1)->addData(SimTime,SC[0].Whl[1].Trq);
-            extUi->Plot13->graph(2)->addData(SimTime,SC[0].Whl[2].Trq);
+            if(SC[0].Nw > 0)
+                extUi->Plot13->graph(0)->addData(SimTime,SC[0].Whl[0].Trq);
+            if(SC[0].Nw > 1)
+                extUi->Plot13->graph(1)->addData(SimTime,SC[0].Whl[1].Trq);
+            if(SC[0].Nw > 2)
+                extUi->Plot13->graph(2)->addData(SimTime,SC[0].Whl[2].Trq);
+            if(SC[0].Nw > 3)
+                extUi->Plot13->graph(3)->addData(SimTime,SC[0].Whl[3].Trq);
             extUi->Plot13->rescaleAxes();
             extUi->Plot13->replot();
         }
@@ -120,7 +135,6 @@ void ToPlot(double SimTime){
         }
         QApplication::processEvents();
     }
-
 }
 
 void MainWindow::StartSimulation(){

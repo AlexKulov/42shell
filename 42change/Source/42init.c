@@ -147,6 +147,7 @@ long DecodeString(char *s)
       else if (!strcmp(s,"SUN_FSW")) return SUN_FSW;
       else if (!strcmp(s,"LVLH_FSW")) return LVLH_FSW;
       else if (!strcmp(s,"POINT_FSW")) return POINT_FSW;
+      else if (!strcmp(s,"NADIR_FSW")) return NADIR_FSW;
 
       else if (!strcmp(s,"PHOBOS")) return PHOBOS;
       else if (!strcmp(s,"DEIMOS")) return DEIMOS;
