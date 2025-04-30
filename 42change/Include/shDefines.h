@@ -12,29 +12,18 @@
 /*    All Other Rights Reserved.                                      */
 
 
-#ifndef __42GLFW_H__
-#define __42GLFW_H__
+#ifndef __SH_DEFINES_H__
+#define __SH_DEFINES_H__
 
-#include <stdlib.h>
-#include <math.h>
-#include <stdio.h>
+/*Model mode*/
+#define DYN_ONE_BODY (33)
 
-/*
-** #ifdef __cplusplus
-** namespace _42 {
-** using namespace Kit;
-** #endif
-*/
+/*FSW tag*/
+#define PROTOTYPE_FSW (330)
+#define AD_HOC_FSW (331)
+#define SUN_FSW (332)
+#define LVLH_FSW (333)
+#define POINT_FSW (334)
+#define NADIR_FSW (335)
 
-EXTERN GLFWwindow *CamWindow;
-EXTERN GLFWwindow *MapWindow;
-EXTERN GLFWwindow *OrreryWindow;
-EXTERN GLFWwindow *SphereWindow;
-
-/*
-** #ifdef __cplusplus
-** }
-** #endif
-*/
-
-#endif /* __42GLFW_H__ */
+#endif /* __42DEFINES_H__ */

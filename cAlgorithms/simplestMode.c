@@ -260,19 +260,18 @@ static void FindNWref (double ScRi[3], const double ScVi[3], const double PointR
 void PointOrientation(struct SCType *S)
 {
     struct AcType *AC;
-    struct AcPrototypeCtrlType *C;
     struct CmdType *Cmd;
     long i;
 
     AC = &S->AC;
-    C = &AC->PrototypeCtrl;
     Cmd = &AC->Cmd;
 
     static double kw[3] = {0.5,0.5,0.5};
     static double ka[3] = {0.01,0.01,0.01};
     static double lat = 0, lng = 0, alt = 0;
-    if (C->Init){
-        C->Init = 0;
+    static long Init = 1;
+    if (Init){
+        Init = 0;
         lat = -2.5, lng = 140.71, alt = 1; //Джаяпура
         for(i=0;i<3;i++){
             FindPDGains(AC->MOI[i][i],0.1,0.7,
@@ -304,15 +303,16 @@ void PointOrientation(struct SCType *S)
     FindNWref(S->PosN, S->VelN, eartPointN, nref, wref, dwref);
 
     QxV(S->B[0].qn,wref,Cmd->wrn);//D*wref
+    double werr[3];
     for(i=0;i<3;i++)
-        C->werr[i] = AC->wbn[i] - Cmd->wrn[i];
+        werr[i] = AC->wbn[i] - Cmd->wrn[i];
 
     double tempV[3];
     double wJw[3];
     MxV(AC->MOI,AC->wbn,tempV);
     VxV(AC->wbn,tempV,wJw);
     double Jwexwr[3];
-    VxV(C->werr,Cmd->wrn,tempV);
+    VxV(werr,Cmd->wrn,tempV);
     MxV(AC->MOI,tempV,Jwexwr);
 
     double Jdwr[3];
@@ -324,7 +324,7 @@ void PointOrientation(struct SCType *S)
     VxV(tempV,Yb,nrxYb);
 
     for(i=0;i<3;i++)
-        AC->Tcmd[i] = wJw[i]-Jwexwr[i]+Jdwr[i]-kw[i]*C->werr[i]-ka[i]*nrxYb[i];
+        AC->Tcmd[i] = wJw[i]-Jwexwr[i]+Jdwr[i]-kw[i]*werr[i]-ka[i]*nrxYb[i];
 
     WheelProcessing(AC);
 

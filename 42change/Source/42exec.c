@@ -15,6 +15,7 @@
 #define DECLARE_GLOBALS
 #include "42.h"
 #undef DECLARE_GLOBALS
+#include "shDefines.h"
 
 /* #ifdef __cplusplus
 ** namespace _42 {
@@ -304,6 +305,76 @@ void ZeroFrcTrq(void)
 #ifdef _USE_QTPLOT_
     extern void ToPlot(double Time);
 #endif
+extern void OneBodyRK4(struct SCType *S);
+extern void PolyhedronCowellRK4(struct SCType *S);
+extern void FixedOrbitPosition(struct SCType *S);
+extern void EulHillRK4(struct SCType *S);
+extern void CowellRK4(struct SCType *S);
+extern void EnckeRK4(struct SCType *S);
+extern void ThreeBodyEnckeRK4(struct SCType *S);
+
+static void shDynamics(struct SCType *S){
+    if(S->DynMethod == DYN_ONE_BODY) {
+
+        OneBodyRK4(S);
+    }
+    else{
+        Dynamics(S);
+    }
+    struct OrbitType *O;
+
+    O = &Orb[S->RefOrb];
+
+    switch(O->Regime) {
+       case ORB_ZERO :
+       case ORB_FLIGHT :
+          if (O->PolyhedronGravityEnabled) {
+             PolyhedronCowellRK4(S);
+          }
+          else CowellRK4(S);
+          break;
+       case ORB_CENTRAL :
+          switch(S->OrbDOF) {
+             case ORBDOF_FIXED :
+                FixedOrbitPosition(S);
+                break;
+             case ORBDOF_EULER_HILL :
+                EulHillRK4(S);
+                break;
+             case ORBDOF_COWELL :
+                CowellRK4(S);
+                break;
+             default :
+                EnckeRK4(S);
+          }
+          break;
+       case ORB_THREE_BODY :
+          switch(S->OrbDOF) {
+             case ORBDOF_FIXED :
+                FixedOrbitPosition(S);
+                break;
+             case ORBDOF_EULER_HILL :
+                EulHillRK4(S);
+                break;
+             case ORBDOF_COWELL :
+                CowellRK4(S);
+                break;
+             default :
+                ThreeBodyEnckeRK4(S);
+          }
+          break;
+       default :
+          printf("Unknown Orbit Regime in Dynamics.  Bailing out.\n");
+          exit(1);
+    }
+}
+
+static void shellFeakReport(){
+
+}
+
+extern void shFlightSoftWare(struct SCType *S);
+
 long SimStep(void)
 {
       long Isc;
@@ -328,12 +399,12 @@ long SimStep(void)
                Environment(S);    /* Magnetic Field, Atmospheric Density */
                Perturbations(S);  /* Environmental Forces and Torques */
                Sensors(S);
-               FlightSoftWare(S);
+               shFlightSoftWare(S);
                Actuators(S);
                PartitionForces(S); /* Orbit-affecting and "internal" */
             }
          }
-         Report();  /* File Output */
+         shellFeakReport();  /* File Output */
       }
 
       ReportProgress();
@@ -344,7 +415,7 @@ long SimStep(void)
 
       /* Update Dynamics to next Timestep */
       for(Isc=0;Isc<Nsc;Isc++) {
-         if (SC[Isc].Exists) Dynamics(&SC[Isc]);
+         if (SC[Isc].Exists) shDynamics(&SC[Isc]);
       }
       SimComplete = AdvanceTime();
       OrbitMotion(DynTime);
@@ -361,12 +432,12 @@ long SimStep(void)
             Environment(S);    /* Magnetic Field, Atmospheric Density */
             Perturbations(S);  /* Environmental Forces and Torques */
             Sensors(S);
-            FlightSoftWare(S);
+            shFlightSoftWare(S);
             Actuators(S);
             PartitionForces(S); /* Orbit-affecting and "internal" */
          }
       }
-      Report();  /* File Output */
+      shellFeakReport();  /* File Output */
 
       #ifdef _USE_QTPLOT_
       ToPlot(SimTime);

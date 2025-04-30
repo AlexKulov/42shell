@@ -50,9 +50,13 @@ CONFIG += 42GUI
         LIBS += ./freeglut/lib/libfreeglut_static.a
         LIBS += -lopengl32 -lglu32
     }
+    unix: {
+        LIBS += -lGL -lglut -lGLEW -lGLU
+    }
 }
 
-INCLUDEPATH +=../42change/Include \
+INCLUDEPATH +=../42/Include \
+              ../42change/Include \
               ../42/Kit/Include
 
 SOURCES += \
@@ -69,27 +73,41 @@ SOURCES += \
         ../42/Kit/Source/sphkit.c \
         ../42/Kit/Source/timekit.c \
         ../42/Source/42actuators.c \
-        ../42change/Source/42cmd.c \
-        ../42change/Source/42dynamics.c \
         ../42/Source/42environs.c \
         ../42/Source/42ephem.c \
-        ../42change/Source/42exec.c \
-        ../42change/Source/42fsw.c \
-        ../42change/Source/42init.c \
         ../42/Source/42ipc.c \
         ../42/Source/42perturb.c \
-        ../42/Source/42report.c \
         ../42/Source/42sensors.c \
         ../42/Source/42jitter.c \
         ../42/Source/42joints.c \
         ../42/Source/42optics.c \
         ../42/Source/AcApp.c \
+        ../42/Source/42dynamics.c \
+        #../42/Source/42init.c \
+        ../42/Source/42fsw.c \
+        ../42/Source/42cmd.c \
+        ../42change/Source/42init.c \
+        ../42change/Source/shFsw.c \
+        ../42change/Source/shIokit.c \
+        ../42change/Source/42exec.c \
+        ../cAlgorithms/serviceAlg.c \
+        ../cAlgorithms/simplestMode.c
+
+#42 version after 27.03.25
+CONFIG += IPC_OVERHAUL
+IPC_OVERHAUL {
+    SOURCES += \
+        ../42/Source/AutoCode/TxRxIPC.c \
+        ../42/Source/AutoCode/WriteAcToCsv.c \
+        ../42/Source/AutoCode/WriteScToCsv.c
+}
+else{
+   SOURCES += \
         ../42/Source/IPC/SimReadFromFile.c \
         ../42/Source/IPC/SimReadFromSocket.c \
         ../42/Source/IPC/SimWriteToFile.c \
-        ../42/Source/IPC/SimWriteToSocket.c \
-        ../cAlgorithms/serviceAlg.c \
-        ../cAlgorithms/simplestMode.c
+        ../42/Source/IPC/SimWriteToSocket.c
+}
 
 TEMPLATE = app
 TARGET = 42
