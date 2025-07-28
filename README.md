@@ -19,7 +19,7 @@
     |   |-- Contains code files (QtSource) only Qt lib (Qt5 m.b. more)
     |   |-- Contains qt project file for build from ../42 folder
     |-- 42InOut4Mode
-	|-- 42InOutSimplest
+    |-- 42InOutSimplest
     |   |-- Like 42/InOut, but demo example for 42shell repo
     |-- cAlgorithms
     |   |-- Contains user algorithms (on-board and other)
@@ -36,16 +36,17 @@ MinGW 32(64)-bit
 
 ## Быстрый старт для OS Windows/Linux
 
-**Only OS Windows**: 0) скопируйте dll файлы из папок 42support/glew и 42support/freeglut 
-в папку 42 
+**Only OS Windows**: 
+0) скопируйте dll файлы из папок 42support/glew и 42support/freeglut в папку 42 
 (чтобы запускать exe-файл, который компилируется в этой папке)
-**OS Windows/Linux(Ubuntu 18)**: 1) откройте файл 42support/42.pro через Qt Creator, нажмите "Подробнее" и выбирете директорию 
+**OS Windows/Linux(Ubuntu 18)**: 
+1) откройте файл 42support/42.pro через Qt Creator, нажмите "Подробнее" и выбирете директорию 
 42support для всех трёх случаев (Отладка-Выпуск-Проифлирование) и нажмите конопку 
 "Настроить проект" 
 2) запустите проект на выполнение (слева внизу зелёный треугольник с жуком)
 3) на появившемся виджете нажмите кнопку "Старт"
 
-в итоге должна появится 3D графика (42), а также должны начать отрисовываться графики(Qt)
+В итоге должна появится 3D графика (42), а также должны начать отрисовываться графики(Qt)
 **Only OS Linux(Ubuntu 18)**: скорее всего работает и на других дистрибутивах Linux
 
 ## Тестовые примеры 42InOut...
