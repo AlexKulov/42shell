@@ -59,10 +59,10 @@ NONE                        ! Parameter File Name
 *************************** Wheel Parameters ***************************
 FALSE                       ! Wheel Drag Active
 FALSE                       ! Wheel Jitter Active
-2                           ! Number of wheels
+3                           ! Number of wheels
 =============================  Wheel 0  ================================
 0.0                         ! Initial Momentum, N-m-sec
-0.57735   0.57735   0.57735     ! Wheel Axis Components, [X, Y, Z]
+1.0   0.0   0.0             ! Wheel Axis Components, [X, Y, Z]
 0.14   50.0                 ! Max Torque (N-m), Momentum (N-m-sec)
 0.012                       ! Wheel Rotor Inertia, kg-m^2
 0                           ! Body
@@ -70,7 +70,15 @@ FALSE                       ! Wheel Jitter Active
 NONE                        ! Drag/Jitter Input File Name
 =============================  Wheel 1  ================================
 0.0                         ! Initial Momentum, N-m-sec
--0.57735   0.57735   0.57735    ! Wheel Axis Components, [X, Y, Z]
+0.0   1.0   0.0             ! Wheel Axis Components, [X, Y, Z]
+0.14   50.0                 ! Max Torque (N-m), Momentum (N-m-sec)
+0.012                       ! Wheel Rotor Inertia, kg-m^2
+0                           ! Body
+0                           ! Node
+NONE                        ! Drag/Jitter Input File Name
+=============================  Wheel 2  ================================
+0.0                         ! Initial Momentum, N-m-sec
+0.0   0.0   1.0             ! Wheel Axis Components, [X, Y, Z]
 0.14   50.0                 ! Max Torque (N-m), Momentum (N-m-sec)
 0.012                       ! Wheel Rotor Inertia, kg-m^2
 0                           ! Body
@@ -146,12 +154,20 @@ PULSED                      ! Mode (PULSED or PROPORTIONAL)
 0                           ! Body
 0                           ! Node
 ************************* Fine Sun Sensor *******************************
-1                           ! Number of Fine Sun Sensors
+2                           ! Number of Fine Sun Sensors
 =============================== FSS 0 ===================================
 0.2                         ! Sample Time,sec
 70.0  0.0  0.0  231         ! Mounting Angles (deg), Seq in Body
 Z_AXIS                      ! Boresight Axis X_AXIS, Y_AXIS, or Z_AXIS
-32.0   32.0                 ! H, V FOV Size, deg
+90.0   90.0                 ! H, V FOV Size, deg
+0.1                         ! Noise Equivalent Angle, deg RMS
+0.5                         ! Quantization, deg
+0                           ! Node
+=============================== FSS 1 ===================================
+0.2                         ! Sample Time,sec
+-20.0  0.0  0.0  231         ! Mounting Angles (deg), Seq in Body
+Z_AXIS                      ! Boresight Axis X_AXIS, Y_AXIS, or Z_AXIS
+90.0   90.0                 ! H, V FOV Size, deg
 0.1                         ! Noise Equivalent Angle, deg RMS
 0.5                         ! Quantization, deg
 0                           ! Node

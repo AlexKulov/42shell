@@ -455,6 +455,7 @@ long SimStep(void)
 
 }
 /**********************************************************************/
+extern FILE *FileRead(const char *Path, const char *File);
 int exec(int argc,char **argv)
 {
       long Done = 0;
@@ -472,7 +473,15 @@ int exec(int argc,char **argv)
 
       InitSim(argc,argv);
       CmdInterpreter();
-      InitInterProcessComm();
+
+      FILE * infile = FileRead(InOutPath,"Inp_IPC.txt");
+      if(infile){
+          InitInterProcessComm();
+      }
+      else{
+          Nipc = 0;
+      }
+
       #ifdef _ENABLE_GUI_
          if (GLEnable) {
             HandoffToGui(argc,argv);
