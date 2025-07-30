@@ -369,7 +369,7 @@ static void shDynamics(struct SCType *S){
     }
 }
 
-static void shellFeakReport(){
+static void shFeakReport(){
 
 }
 
@@ -404,7 +404,7 @@ long SimStep(void)
                PartitionForces(S); /* Orbit-affecting and "internal" */
             }
          }
-         shellFeakReport();  /* File Output */
+         shFeakReport();  /* File Output */
       }
 
       ReportProgress();
@@ -437,7 +437,7 @@ long SimStep(void)
             PartitionForces(S); /* Orbit-affecting and "internal" */
          }
       }
-      shellFeakReport();  /* File Output */
+      shFeakReport();  /* File Output */
 
       #ifdef _USE_QTPLOT_
       ToPlot(SimTime);

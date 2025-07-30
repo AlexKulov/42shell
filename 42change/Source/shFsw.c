@@ -34,6 +34,7 @@ extern void EasySunMode(struct SCType *S);
 extern void EasyLvlhMode(struct SCType *S);
 extern void PointOrientation(struct SCType *S);
 extern void NadirMode(struct SCType *S);
+extern void MapCmdsToActuators(struct SCType *S);
 void shFlightSoftWare(struct SCType *S)
 {
       #ifdef _AC_STANDALONE_
