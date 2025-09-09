@@ -60,5 +60,7 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 
 # Setting for Windows
 if(WIN32)
-    target_link_libraries(42twin PRIVATE ws2_32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE ws2_32)
 endif()
+
+target_link_libraries(${PROJECT_NAME} m)
