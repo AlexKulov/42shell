@@ -13,7 +13,7 @@
 
 
 #include "42.h"
-#include "shDefines.h"
+#include "shHeaders.h"
 
 void AcFsw(struct AcType *AC);
 void WriteToSocket(SOCKET Socket, char **Prefix, long Nprefix, long EchoEnabled);
@@ -64,11 +64,8 @@ void shFlightSoftWare(struct SCType *S)
             case NADIR_FSW:
                 NadirMode(S);
                 break;
-
          }
-         
       }
-      
       MapCmdsToActuators(S);
 }
 

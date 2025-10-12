@@ -60,7 +60,7 @@ MainWindow::~MainWindow()
 extern "C"{
 #endif
 #include "42.h"
-#include "../cAlgorithms/serviceAlg.h"
+#include "../42add/serviceAlg.h"
 extern int exec(int argc,char **argv);
 
 void ToPlot(double Time);

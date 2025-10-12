@@ -15,7 +15,8 @@
 #define DECLARE_GLOBALS
 #include "42.h"
 #undef DECLARE_GLOBALS
-#include "shDefines.h"
+#include "shHeaders.h"
+#include "modelSPS.h"
 
 /* #ifdef __cplusplus
 ** namespace _42 {
@@ -305,13 +306,6 @@ void ZeroFrcTrq(void)
 #ifdef _USE_QTPLOT_
     extern void ToPlot(double Time);
 #endif
-extern void OneBodyRK4(struct SCType *S);
-extern void PolyhedronCowellRK4(struct SCType *S);
-extern void FixedOrbitPosition(struct SCType *S);
-extern void EulHillRK4(struct SCType *S);
-extern void CowellRK4(struct SCType *S);
-extern void EnckeRK4(struct SCType *S);
-extern void ThreeBodyEnckeRK4(struct SCType *S);
 
 static void shDynamics(struct SCType *S){
     if(S->DynMethod == DYN_ONE_BODY) {
@@ -393,7 +387,7 @@ long SimStep(void)
          Ephemerides(); /* Sun, Moon, Planets, Spacecraft, Useful Auxiliary Frames */
 
          ZeroFrcTrq();
-         for(Isc=0;Isc<Nsc;Isc++) {
+         for(Isc=0; Isc<Nsc; Isc++) {
             S = &SC[Isc];
             if (S->Exists) {
                Environment(S);    /* Magnetic Field, Atmospheric Density */
@@ -402,6 +396,7 @@ long SimStep(void)
                shFlightSoftWare(S);
                Actuators(S);
                PartitionForces(S); /* Orbit-affecting and "internal" */
+               InitSpsModel(S->Label);
             }
          }
          shFeakReport();  /* File Output */
@@ -434,6 +429,7 @@ long SimStep(void)
             Sensors(S);
             shFlightSoftWare(S);
             Actuators(S);
+            SpsModel(S);
             PartitionForces(S); /* Orbit-affecting and "internal" */
          }
       }

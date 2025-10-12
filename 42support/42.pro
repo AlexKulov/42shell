@@ -3,7 +3,7 @@ QT -= gui
 CONFIG += console
 CONFIG -= app_bundle
 
-CONFIG += QTPLOT
+CONFIG -= QTPLOT
 QTPLOT {
     DEFINES += _USE_QTPLOT_
     QT += core gui widgets
@@ -57,7 +57,8 @@ CONFIG += 42GUI
 
 INCLUDEPATH +=../42/Include \
               ../42change/Include \
-              ../42/Kit/Include
+              ../42/Kit/Include \
+              ../42add
 
 SOURCES += \
         ../42/Kit/Source/dcmkit.c \
@@ -89,9 +90,10 @@ SOURCES += \
         ../42change/Source/42init.c \
         ../42change/Source/shFsw.c \
         ../42change/Source/shIokit.c \
-        ../42change/Source/42exec.c \
-        ../cAlgorithms/serviceAlg.c \
-        ../cAlgorithms/simplestMode.c
+        ../42add/serviceAlg.c \
+        ../42add/simplestMode.c \
+        ../42add/modelSPS.c \
+    ../42change/Source/shExec.c
 
 #42 version after 27.03.25
 CONFIG += IPC_OVERHAUL

@@ -1,0 +1,22 @@
+***********************************************************************
+*********************** Supply Power System ***************************
+***********************************************************************
+"Simple"                       !  For what's SC by Label
+1360                        !  Sun radiation coefficient, Wt/m2
+27                          !  Nominal voltage, V
+********************* Solar Panels Parameters *************************
+1                           ! Number of Panel
+==============================  SP 0  =================================
+1.0                         ! Area, m2
+0.23                        ! Result Coef(COP*Occupancy*MaxUFCoef*...)
+-1.0  0.0  0.0              ! Normal Axis expressed in Body Frame
+10.0                        ! Min sun angle with plane [0;90], deg
+OFF                         ! Turn ON-OFF
+-1.0  0.0  0.0              ! Normal Axis now if Turn ON
+******************************* Battery ********************************
+1                           ! Number of Battery
+============================== Battery 0 ===============================
+0.1                         ! Nominal Capacity, A*h
+1.0                         ! Self discharge, % per mounth
+1.0                         ! Max I charge
+1.0                         ! Max I discharge
