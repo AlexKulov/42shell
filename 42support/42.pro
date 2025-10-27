@@ -56,7 +56,6 @@ CONFIG += 42GUI
 }
 
 INCLUDEPATH +=../42/Include \
-              ../42change/Include \
               ../42/Kit/Include \
               ../42add
 
