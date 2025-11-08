@@ -309,57 +309,56 @@ void ZeroFrcTrq(void)
 
 static void shDynamics(struct SCType *S){
     if(S->DynMethod == DYN_ONE_BODY) {
-
         OneBodyRK4(S);
+        struct OrbitType *O;
+
+        O = &Orb[S->RefOrb];
+
+        switch(O->Regime) {
+           case ORB_ZERO :
+           case ORB_FLIGHT :
+              if (O->PolyhedronGravityEnabled) {
+                 PolyhedronCowellRK4(S);
+              }
+              else CowellRK4(S);
+              break;
+           case ORB_CENTRAL :
+              switch(S->OrbDOF) {
+                 case ORBDOF_FIXED :
+                    FixedOrbitPosition(S);
+                    break;
+                 case ORBDOF_EULER_HILL :
+                    EulHillRK4(S);
+                    break;
+                 case ORBDOF_COWELL :
+                    CowellRK4(S);
+                    break;
+                 default :
+                    EnckeRK4(S);
+              }
+              break;
+           case ORB_THREE_BODY :
+              switch(S->OrbDOF) {
+                 case ORBDOF_FIXED :
+                    FixedOrbitPosition(S);
+                    break;
+                 case ORBDOF_EULER_HILL :
+                    EulHillRK4(S);
+                    break;
+                 case ORBDOF_COWELL :
+                    CowellRK4(S);
+                    break;
+                 default :
+                    ThreeBodyEnckeRK4(S);
+              }
+              break;
+           default :
+              printf("Unknown Orbit Regime in Dynamics.  Bailing out.\n");
+              exit(1);
+        }
     }
     else{
         Dynamics(S);
-    }
-    struct OrbitType *O;
-
-    O = &Orb[S->RefOrb];
-
-    switch(O->Regime) {
-       case ORB_ZERO :
-       case ORB_FLIGHT :
-          if (O->PolyhedronGravityEnabled) {
-             PolyhedronCowellRK4(S);
-          }
-          else CowellRK4(S);
-          break;
-       case ORB_CENTRAL :
-          switch(S->OrbDOF) {
-             case ORBDOF_FIXED :
-                FixedOrbitPosition(S);
-                break;
-             case ORBDOF_EULER_HILL :
-                EulHillRK4(S);
-                break;
-             case ORBDOF_COWELL :
-                CowellRK4(S);
-                break;
-             default :
-                EnckeRK4(S);
-          }
-          break;
-       case ORB_THREE_BODY :
-          switch(S->OrbDOF) {
-             case ORBDOF_FIXED :
-                FixedOrbitPosition(S);
-                break;
-             case ORBDOF_EULER_HILL :
-                EulHillRK4(S);
-                break;
-             case ORBDOF_COWELL :
-                CowellRK4(S);
-                break;
-             default :
-                ThreeBodyEnckeRK4(S);
-          }
-          break;
-       default :
-          printf("Unknown Orbit Regime in Dynamics.  Bailing out.\n");
-          exit(1);
     }
 }
 

@@ -35,6 +35,7 @@ extern void EasyLvlhMode(struct SCType *S);
 extern void PointOrientation(struct SCType *S);
 extern void NadirMode(struct SCType *S);
 extern void MapCmdsToActuators(struct SCType *S);
+extern void thrControl(struct SCType *S);
 void shFlightSoftWare(struct SCType *S)
 {
       #ifdef _AC_STANDALONE_
@@ -64,7 +65,14 @@ void shFlightSoftWare(struct SCType *S)
             case NADIR_FSW:
                 NadirMode(S);
                 break;
+            case THR_FSW:
+                EasyLvlhMode(S);
+                if(SimTime>100.0){
+                    thrControl(S);
+                }
+                break;
          }
+
       }
       MapCmdsToActuators(S);
 }

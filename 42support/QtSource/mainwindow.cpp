@@ -38,8 +38,12 @@ ui(new Ui::MainWindow)
 
     ui->Plot21->addGraph(); //plotKm
     ui->Plot21->graph(0)->setPen(QColor(Qt::red));
+    ui->Plot21->addGraph(); //plotKm
+    ui->Plot21->graph(1)->setPen(QColor(Qt::blue));
     ui->Plot22->addGraph();//plotWheelPower
     ui->Plot22->graph(0)->setPen(QColor(Qt::red));
+    ui->Plot22->addGraph(); //plotKm
+    ui->Plot22->graph(1)->setPen(QColor(Qt::blue));
 
     ui->Plot31->addGraph();//plotScMode
     ui->Plot31->graph(0)->setPen(QColor(Qt::red));
@@ -60,6 +64,7 @@ MainWindow::~MainWindow()
 extern "C"{
 #endif
 #include "42.h"
+#include "modelSPS.h"
 #include "../42add/serviceAlg.h"
 extern int exec(int argc,char **argv);
 
@@ -72,7 +77,7 @@ extern double modeAng[3];
 void ToPlot(double SimTime){
     mSimTime = SimTime;
     static unsigned int PlotSampleCounter=0;
-    static unsigned int PlotMaxCounter = 10;
+    static unsigned int PlotMaxCounter = 25;
 
     PlotSampleCounter++;
     if(PlotSampleCounter>PlotMaxCounter){
@@ -110,26 +115,38 @@ void ToPlot(double SimTime){
             extUi->Plot13->replot();
         }
 
-        if(false){
-            extUi->Plot21->graph(0)->addData(SimTime,0);
+        if(true){
+            double posN0 = 0;
+            double posN1 = 0;
+            posN0 = MAGV(SC[0].PosN) - World[EARTH].rad;
+            if(Nsc>1)
+                posN1 = MAGV(SC[1].PosN) - World[EARTH].rad;
+            extUi->Plot21->graph(0)->addData(SimTime, posN1/1000);
+            extUi->Plot21->graph(1)->addData(SimTime, posN0/1000);
             extUi->Plot21->rescaleAxes();
             extUi->Plot21->replot();
         }
 
-        if(false){
-            extUi->Plot22->graph(0)->addData(SimTime,1);
+        if(true){
+            double magVelN0 = 0;
+            double magVelN1 = 0;
+            magVelN0 = MAGV(SC[0].VelN)/1000;
+            if(Nsc>1)
+                magVelN1 = MAGV(SC[1].VelN)/1000;
+            extUi->Plot22->graph(0)->addData(SimTime, magVelN1);
+            extUi->Plot22->graph(1)->addData(SimTime, magVelN0);
             extUi->Plot22->rescaleAxes();
             extUi->Plot22->replot();
         }
 
         if(false){
-            extUi->Plot31->graph(0)->addData(SimTime,-1);
+            extUi->Plot31->graph(0)->addData(SimTime, 0);
             extUi->Plot31->rescaleAxes();
             extUi->Plot31->replot();
         }
 
-        if(false){
-            extUi->Plot32->graph(0)->addData(SimTime,1);
+        if(true){
+            extUi->Plot32->graph(0)->addData(SimTime, SC[0].Eclipse);
             extUi->Plot32->rescaleAxes();
             extUi->Plot32->replot();
         }

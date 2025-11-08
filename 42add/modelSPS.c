@@ -1,6 +1,7 @@
 /*    Code by Alexsandr Kulakov                              */
 
 #include "42.h"
+#include "modelSPS.h"
 extern FILE *FileRead(const char *Path, const char *File);
 
 #define MONTH_SEC (2592000) //30 дней
@@ -77,7 +78,7 @@ static void SPDegradation(double * k, double t, double tmax)
     *k = 1.0 - t/(10.0*tmax);
 }
 
-static void CalcUI(double Pt, double *I, double * U)
+/*static void CalcUI(double Pt, double *I, double * U)
 {
     //U(I)=35 - 4/(12-I), где 12 - максимальный ток, а 35 - макс напряжение
     //решаем уравнение a*U^2-b*U+c=0 :
@@ -85,14 +86,13 @@ static void CalcUI(double Pt, double *I, double * U)
     *U = (b-sqrt(b*b-1680.0*Pt))/24.0;
     *I = Pt / *U;
 }
-
 static void CalcUIAb(double Pt, double *I, double * U)
 {
     // для СБ U(I) = -7*I/(3+I) + 27, где 27 - максимальное напряжение
     double b = 81.0-Pt;
     *U = (b+sqrt(b*b+240.0*Pt))/6.0;
     *I = Pt / *U;
-}
+}*/
 
 static SupplyPowerSystemType * SPS[32];
 static long Nsps;
@@ -142,7 +142,7 @@ void InitSpsModel(char * ScLabel){
                 UNITV(SPSyst->SolPnl[Ie].VecB0);
                 double alfa = 0;
                 fscanf(spsFile,"%lf %[^\n] %[\n]",&alfa,junk,&newline);
-                SPSyst->SolPnl[Ie].MaxCosAlf = cos(alfa);
+                SPSyst->SolPnl[Ie].MaxCosAlf = cos((90.0-alfa)*M_PI/180);
                 fscanf(spsFile,"%s %[^\n] %[\n]",response,junk,&newline);
                 SPSyst->SolPnl[Ie].TurnTag=DecodeString(response);
                 fscanf(spsFile,"%lf %[^\n] %[\n]",&alfa,junk,&newline);
@@ -166,6 +166,7 @@ void InitSpsModel(char * ScLabel){
             for(Ie=0;Ie<SPSyst->Nbt;Ie++){
                 fscanf(spsFile,"%[^\n] %[\n]",junk,&newline);
                 fscanf(spsFile,"%lf %[^\n] %[\n]",&SPSyst->Bat[Ie].NomCap,junk,&newline);
+                fscanf(spsFile,"%lf %[^\n] %[\n]",&SPSyst->Bat[Ie].CurCap,junk,&newline);
                 fscanf(spsFile,"%lf %[^\n] %[\n]",&SPSyst->Bat[Ie].Discharge,junk,&newline);
                 fscanf(spsFile,"%lf %[^\n] %[\n]",&SPSyst->Bat[Ie].MaxIcharge,junk,&newline);
                 fscanf(spsFile,"%lf %[^\n] %[\n]",&SPSyst->Bat[Ie].MaxIdischarge,junk,&newline);
@@ -177,42 +178,42 @@ void InitSpsModel(char * ScLabel){
 /**********************************************************************/
 /*  This function modeling simplest power supply system of SC         */
 /*  This function is called at the simulation rate.                   */
-
-int SpsModel(struct SCType *S){
-    //----------------- Выбираем соответствующую СЭП
-    long Is;
-    long isUnknownSps = TRUE;
-    for(Is=0;Is<Nsps;Is++){
+static SupplyPowerSystemType * getScSps(struct SCType *S){
+    for(long Is=0;Is<Nsps;Is++){
         if(!strcmp(SPS[Is]->ScLabel, S->Label)){
-            isUnknownSps = FALSE;
-            break;
+            return SPS[Is];
         }
     }
-    if(isUnknownSps)
+    return NULL;
+}
+int SpsModel(struct SCType *S){
+    //----------------- Выбираем соответствующую СЭП
+    SupplyPowerSystemType * SPSyst = getScSps(S);//S->SPS;
+    if(SPSyst == NULL)
         return 0;
 
-    SupplyPowerSystemType * SPSyst = SPS[Is];//S->SPS;
     long Ib;
     for(Ib=0;Ib<SPSyst->Nbt;Ib++){
-
         //double dAbCt = SPSyst->AbC - SPSyst->AbCt;
     }
-    //------ Поворачиваем панель, если поворачивается ----------
-    //if(SPSyst->TurnTag){
-        // TurnSolarPanel(AC->spvb, SPSyst->VecSPinBt);
-    //}
+
     SPSyst->InPt = 0.0;
     double FabsCosAlf = 0.0;
-    if(S->Eclipse == FALSE){ //проверка на тень
-        for(long Ip=0;Ip<SPSyst->Nsp;Ip++){
-            struct SollarPanelType * SolPnl = &SPSyst->SolPnl[Ip];
-            SolPnl->CosAlf=VoV(SolPnl->VecBt,S->svb);
-            FabsCosAlf = SolPnl->CosAlf;
-            // если угол меньше 75 гр, то считаем dKt и соответственно Pin
-            if(FabsCosAlf>SolPnl->MaxCosAlf) {
-                //SPDegradation(&SPSyst->dKt, SimTime, STOPTIME);
-                SPSyst->InPt += SPSyst->SunRad * SolPnl->ResCoef * SolPnl->Area * FabsCosAlf;
-            }
+    for(long Ip=0;Ip<SPSyst->Nsp;Ip++){
+        struct SollarPanelType * SolPnl = &SPSyst->SolPnl[Ip];
+        //------ Поворачиваем панель, если поворачивается ----------
+        if(SolPnl->TurnTag){
+            // TurnSolarPanel(AC->spvb, SPSyst->VecSPinBt);
+        }
+        else{
+            CopyUnitV(SolPnl->VecB0, SolPnl->VecBt);
+        }
+
+        SolPnl->CosAlf=VoV(SolPnl->VecBt,S->svb);
+        // если угол меньше 75 гр, то считаем dKt и соответственно Pin
+        if(SolPnl->CosAlf>SolPnl->MaxCosAlf && S->Eclipse == FALSE) {
+            //SPDegradation(&SPSyst->dKt, SimTime, STOPTIME);
+            SPSyst->InPt += SPSyst->SunRad * SolPnl->ResCoef * SolPnl->Area * SolPnl->CosAlf;
         }
     }
 
@@ -256,11 +257,28 @@ int SpsModel(struct SCType *S){
     return 0;
 }
 
-/*float getSpsSoc(struct SCType *S){
-    if(S->Nsps == 1){
-        return (float)S->SPS->Bat.SOC;
+long getSpsSoc(struct SCType *S, float * batSOC){
+    SupplyPowerSystemType * SPSyst = getScSps(S);
+    if(SPSyst){
+        for(long i=0;i<SPSyst->Nbt;i++){
+            batSOC[i] =  SPSyst->Bat[i].SOC;
+        }
+        return SPSyst->Nbt;
     }
     else{
-        return 0.0;
+        return 0;
     }
-}*/
+}
+
+long getSpsCosAlfa(struct SCType *S, float * cosAlf){
+    SupplyPowerSystemType * SPSyst = getScSps(S);
+    if(SPSyst){
+        for(long i=0;i<SPSyst->Nsp;i++){
+            cosAlf[i] =  SPSyst->SolPnl[i].CosAlf;
+        }
+        return SPSyst->Nsp;
+    }
+    else{
+        return 0;
+    }
+}

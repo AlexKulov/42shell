@@ -3,7 +3,7 @@ QT -= gui
 CONFIG += console
 CONFIG -= app_bundle
 
-CONFIG -= QTPLOT
+CONFIG += QTPLOT
 QTPLOT {
     DEFINES += _USE_QTPLOT_
     QT += core gui widgets
@@ -92,7 +92,8 @@ SOURCES += \
         ../42add/serviceAlg.c \
         ../42add/simplestMode.c \
         ../42add/modelSPS.c \
-    ../42change/Source/shExec.c
+    ../42change/Source/shExec.c \
+    ../42add/orbControl.c
 
 #42 version after 27.03.25
 CONFIG += IPC_OVERHAUL
