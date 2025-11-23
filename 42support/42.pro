@@ -1,3 +1,4 @@
+#Test
 QT -= gui
 
 CONFIG += console

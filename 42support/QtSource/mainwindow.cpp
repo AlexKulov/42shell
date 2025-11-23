@@ -14,37 +14,56 @@ ui(new Ui::MainWindow)
     setupPlots();
 
     ui->Plot11->addGraph();
-    ui->Plot11->graph(0)->setPen(QColor(Qt::red));
+    ui->Plot11->graph(0)->setPen(QColor(Qt::green));
     ui->Plot11->addGraph();
-    ui->Plot11->graph(1)->setPen(QColor(Qt::green));
+    ui->Plot11->graph(1)->setPen(QColor(Qt::red));
     ui->Plot11->addGraph();
     ui->Plot11->graph(2)->setPen(QColor(Qt::blue));
 
+
     ui->Plot12->addGraph();
-    ui->Plot12->graph(0)->setPen(QColor(Qt::red));
+    ui->Plot12->graph(0)->setPen(QColor(Qt::green));
     ui->Plot12->addGraph();
-    ui->Plot12->graph(1)->setPen(QColor(Qt::green));
-    ui->Plot12->addGraph();
-    ui->Plot12->graph(2)->setPen(QColor(Qt::blue));
+    ui->Plot12->graph(1)->setPen(QColor(Qt::red));
+
 
     ui->Plot13->addGraph();
-    ui->Plot13->graph(0)->setPen(QColor(Qt::red));
+    ui->Plot13->graph(0)->setPen(QColor(Qt::green));
     ui->Plot13->addGraph();
-    ui->Plot13->graph(1)->setPen(QColor(Qt::green));
+    ui->Plot13->graph(1)->setPen(QColor(Qt::red));
     ui->Plot13->addGraph();
-    ui->Plot13->graph(2)->setPen(QColor(Qt::blue));
-    ui->Plot13->addGraph();
-    ui->Plot13->graph(3)->setPen(QColor(Qt::yellow));
 
-    ui->Plot21->addGraph(); //plotKm
+
+    ui->Plot21->addGraph();
     ui->Plot21->graph(0)->setPen(QColor(Qt::red));
-    ui->Plot22->addGraph();//plotWheelPower
-    ui->Plot22->graph(0)->setPen(QColor(Qt::red));
+    ui->Plot21->addGraph();
+    ui->Plot21->graph(1)->setPen(QColor(Qt::green));
+    ui->Plot21->addGraph();
+    ui->Plot21->graph(2)->setPen(QColor(Qt::blue));
 
-    ui->Plot31->addGraph();//plotScMode
+
+    ui->Plot22->addGraph();
+    ui->Plot22->graph(0)->setPen(QColor(Qt::red));
+    ui->Plot22->addGraph();
+    ui->Plot22->graph(1)->setPen(QColor(Qt::green));
+    ui->Plot22->addGraph();
+    ui->Plot22->graph(2)->setPen(QColor(Qt::blue));
+
+
+    ui->Plot31->addGraph(); //plotKm
     ui->Plot31->graph(0)->setPen(QColor(Qt::red));
-    ui->Plot32->addGraph();//plotWorkAndZRV
+    ui->Plot31->addGraph(); //plotKm
+    ui->Plot31->graph(1)->setPen(QColor(Qt::green));
+    ui->Plot31->addGraph(); //plotKm
+    ui->Plot31->graph(2)->setPen(QColor(Qt::blue));
+
+
+    ui->Plot32->addGraph();
     ui->Plot32->graph(0)->setPen(QColor(Qt::red));
+    ui->Plot32->addGraph();
+    ui->Plot32->graph(1)->setPen(QColor(Qt::green));
+    ui->Plot32->addGraph();
+    ui->Plot32->graph(2)->setPen(QColor(Qt::blue));
 
     uiPlotSampleCounter=0;
     uiPlotMaxCounter = 10;
@@ -78,58 +97,54 @@ void ToPlot(double SimTime){
     if(PlotSampleCounter>PlotMaxCounter){
         PlotSampleCounter = 0;
         if(true){
-            static double angLimit = 5;
-            modeAng[0] = Limit(modeAng[0], -angLimit, angLimit);
-            extUi->Plot11->graph(0)->addData(SimTime,modeAng[0]);
-            modeAng[1] = Limit(modeAng[1], -angLimit, angLimit);
-            extUi->Plot11->graph(1)->addData(SimTime,modeAng[1]);
-            modeAng[2] = Limit(modeAng[2], -angLimit, angLimit);
-            extUi->Plot11->graph(2)->addData(SimTime,modeAng[2]);
+            extUi->Plot11->graph(0)->addData(SimTime,SC[0].Thr[0].F);
+            extUi->Plot11->graph(1)->addData(SimTime,SC[0].Thr[1].F);
             extUi->Plot11->rescaleAxes();
             extUi->Plot11->replot();
         }
 
         if(true){
-            extUi->Plot12->graph(0)->addData(SimTime,SC[0].B[0].wn[0]);
-            extUi->Plot12->graph(1)->addData(SimTime,SC[0].B[0].wn[1]);
-            extUi->Plot12->graph(2)->addData(SimTime,SC[0].B[0].wn[2]);
+            extUi->Plot12->graph(0)->addData(SimTime,SC[0].Thr[2].F);
+            extUi->Plot12->graph(1)->addData(SimTime,SC[0].Thr[3].F);
             extUi->Plot12->rescaleAxes();
             extUi->Plot12->replot();
         }
 
         if(true){
-            if(SC[0].Nw > 0)
-                extUi->Plot13->graph(0)->addData(SimTime,SC[0].Whl[0].Trq);
-            if(SC[0].Nw > 1)
-                extUi->Plot13->graph(1)->addData(SimTime,SC[0].Whl[1].Trq);
-            if(SC[0].Nw > 2)
-                extUi->Plot13->graph(2)->addData(SimTime,SC[0].Whl[2].Trq);
-            if(SC[0].Nw > 3)
-                extUi->Plot13->graph(3)->addData(SimTime,SC[0].Whl[3].Trq);
+            extUi->Plot13->graph(0)->addData(SimTime,SC[0].Thr[4].F);
+            extUi->Plot13->graph(1)->addData(SimTime,SC[0].Thr[5].F);
             extUi->Plot13->rescaleAxes();
             extUi->Plot13->replot();
         }
 
-        if(false){
-            extUi->Plot21->graph(0)->addData(SimTime,0);
+        if(true){
+            extUi->Plot21->graph(0)->addData(SimTime,SC[0].B[0].Trq[0]);
+            extUi->Plot21->graph(1)->addData(SimTime,SC[0].B[0].Trq[1]);
+            extUi->Plot21->graph(2)->addData(SimTime,SC[0].B[0].Trq[2]); //SC[0].B[0].wn[2]
             extUi->Plot21->rescaleAxes();
             extUi->Plot21->replot();
         }
 
-        if(false){
-            extUi->Plot22->graph(0)->addData(SimTime,1);
+        if(true){
+            extUi->Plot22->graph(0)->addData(SimTime,SC[0].B[0].wn[0]); //SC[0].VelR[0]
+            extUi->Plot22->graph(1)->addData(SimTime,SC[0].B[0].wn[1]);
+            extUi->Plot22->graph(2)->addData(SimTime,SC[0].B[0].wn[2]);
             extUi->Plot22->rescaleAxes();
             extUi->Plot22->replot();
         }
 
-        if(false){
-            extUi->Plot31->graph(0)->addData(SimTime,-1);
+        if(true){
+            double magPosN = MAGV(SC[0].PosN);
+            extUi->Plot31->graph(0)->addData(SimTime,magPosN);
+            //extUi->Plot31->graph(1)->addData(SimTime,SC[0].PosN[1]);
+            //extUi->Plot31->graph(2)->addData(SimTime,SC[0].PosN[2]);
             extUi->Plot31->rescaleAxes();
             extUi->Plot31->replot();
         }
 
-        if(false){
-            extUi->Plot32->graph(0)->addData(SimTime,1);
+        if(true){
+            extUi->Plot32->graph(1)->addData(SimTime,SC[0].VelR[0]);
+            extUi->Plot32->graph(2)->addData(SimTime,SC[0].VelEH[0]);
             extUi->Plot32->rescaleAxes();
             extUi->Plot32->replot();
         }
