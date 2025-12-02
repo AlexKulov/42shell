@@ -11,6 +11,7 @@ extern void StarTrackerProcessing(struct AcType *AC);
 extern void FssProcessing(struct AcType *AC);
 extern void MagnetometerProcessing(struct AcType *AC);
 extern void WheelProcessing(struct AcType *AC);
+extern void THRProcessing(struct AcType *AC);
 extern void GpsProcessing(struct AcType *AC);
 
 struct SunModeCtrlType {
@@ -38,9 +39,12 @@ void EasySunMode(struct SCType *S){
     if (C.Init) {
        C.Init = 0;
        C.fvb[0]=0; C.fvb[1]=0; C.fvb[2]=1;
-       for(i=0;i<3;i++)
-          FindPDGains(AC->MOI[i][i],0.1,0.7,
-                      &C.AngRateGain[i],&C.AngGain[i]);
+       for(i=0;i<3;i++){
+           C.AngRateGain[i] = 7.0;
+           C.AngGain[i] = 0.5;
+       }
+          /*FindPDGains(AC->MOI[i][i],0.1,0.7,
+                      &C.AngRateGain[i],&C.AngGain[i]);*/
        /* Chek sensors and actuators */
        if(AC->Nfss == 0 || AC->Ngyro<3){
            printf("EasySunMode: check SC sensors, Nfss=%li, Ngyro=%li\n",
@@ -60,7 +64,7 @@ void EasySunMode(struct SCType *S){
                       -C.AngGain[i]*C.ArgUpr[i];
 
     /* .. Actuator Processing */
-    WheelProcessing(AC);
+    THRProcessing(AC);
 
     for(i=0;i<3;i++)
         modeAng[i] = 0;

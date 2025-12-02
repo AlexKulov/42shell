@@ -11,7 +11,7 @@ CM                          !  Pos of CM or ORIGIN, wrt F
 0.0  0.0  0.0               !  Vel wrt Formation (m/s), expressed in F
 *************************** Initial Attitude ***************************
 NAN                         ! Ang Vel wrt [NL], Att [QA] wrt [NLEF]
-0.3    0.4    0.5           ! Ang Vel (deg/sec)
+5    7    3           ! Ang Vel (deg/sec)
 0.0    0.0    0.0    1.0    ! Quaternion
 20.0    30.0    40.0    213    ! Angles (deg) & Euler Sequence
 ***************************  Dynamics Flags  ***************************
@@ -28,7 +28,7 @@ NONE                        ! Shaker File Name
 1                           ! Number of Bodies
 ================================ Body 0 ================================
 10.0                       ! Mass
-200.0  200.0  300.0         ! Moments of Inertia (kg-m^2)
+400.0  400.0  600.0         ! Moments of Inertia (kg-m^2)
 0.0  0.0  0.0               ! Products of Inertia (xy,xz,yz)
 0.0  0.0  0.0               ! Location of mass center, m
 0.0  0.0  0.0               ! Constant Embedded Momentum (Nms)
@@ -78,37 +78,37 @@ NONE                        ! Drag/Jitter Input File Name
 6                           ! Number of Thrusters
 ==============================  Thr 0  =================================
 PULSED                      ! Mode (PULSED or PROPORTIONAL)
-10.0                      ! Thrust Force (N)
+1.0                      ! Thrust Force (N)
 0.0  0.0  1.0              ! Thrust Axis 
 0                           ! Body
 0                           ! Node
 ==============================  Thr 1  =================================
 PULSED                      ! Mode (PULSED or PROPORTIONAL)
-10.0                      ! Thrust Force (N)
+2.0                      ! Thrust Force (N)
 0.0  0.0  1.0              ! Thrust Axis 
 0                           ! Body
 1                           ! Node
 ==============================  Thr 2  =================================
 PULSED                      ! Mode (PULSED or PROPORTIONAL)
-10.0                      ! Thrust Force (N)
+2.0                      ! Thrust Force (N)
 1.0  0.0  0.0              ! Thrust Axis 
 0                           ! Body
 2                           ! Node
 ==============================  Thr 3  =================================
 PULSED                      ! Mode (PULSED or PROPORTIONAL)
-10.0                      ! Thrust Force (N)
+2.0                      ! Thrust Force (N)
 1.0  0.0  0.0              ! Thrust Axis 
 0                           ! Body
 3                           ! Node
 ==============================  Thr 4  =================================
 PULSED                      ! Mode (PULSED or PROPORTIONAL)
-10.0                      ! Thrust Force (N)
+2.0                      ! Thrust Force (N)
 0.0  1.0  0.0              ! Thrust Axis 
 0                           ! Body
 4                           ! Node
 ==============================  Thr 5  =================================
 PULSED                      ! Mode (PULSED or PROPORTIONAL)
-10.0                      ! Thrust Force (N)
+2.0                      ! Thrust Force (N)
 0.0  1.0  0.0              ! Thrust Axis 
 0                           ! Body
 5                           ! Node

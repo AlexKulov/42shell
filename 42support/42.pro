@@ -91,6 +91,7 @@ SOURCES += \
         ../42change/Source/shFsw.c \
         ../42change/Source/shIokit.c \
         ../42change/Source/42exec.c \
+        ../42change/Source/thrModel.c \
         ../cAlgorithms/serviceAlg.c \
         ../cAlgorithms/simplestMode.c
 

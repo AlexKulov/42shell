@@ -135,7 +135,7 @@ void ToPlot(double SimTime){
 
         if(true){
             double magPosN = MAGV(SC[0].PosN);
-            extUi->Plot31->graph(0)->addData(SimTime,magPosN);
+            extUi->Plot31->graph(0)->addData(SimTime,SC[0].B->Fuel);
             //extUi->Plot31->graph(1)->addData(SimTime,SC[0].PosN[1]);
             //extUi->Plot31->graph(2)->addData(SimTime,SC[0].PosN[2]);
             extUi->Plot31->rescaleAxes();
