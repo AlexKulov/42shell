@@ -35,7 +35,7 @@ void precitionThrModel(struct ThrType *Thr,struct SCType *S)
       Thr->Frc[2] = Thr->F*Thr->A[2];
 
       B = &S->B[Thr->Body];
-      B->Fuel = B->Fuel + Thr->Fuel_treb;
+      B->Fuel = B->Fuel + Thr->Fuel_treb*H_time;
       N = &B->Node[Thr->Node];
 
       VxV(N->PosCm,Thr->Frc,Thr->Trq);
