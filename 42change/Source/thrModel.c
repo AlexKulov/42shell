@@ -1,28 +1,37 @@
 #include "42.h"
-
-void precitionThrModel(struct ThrType *Thr,struct SCType *S)
+void PrecitionThrModel(struct ThrType *Thr,struct SCType *S,double DT)
 {
       struct BodyType *B;
       struct NodeType *N;
-      double F_Sec_On = 2.5;
+      double ThrTimeOn = 0.25;
+      double ThrTimeOff = 1.5;
+      double FSecOn = (Thr->Fmax * Thr->Fmax) / (2*ThrTimeOn);
+      double FSecOff = (Thr->Fmax * Thr->Fmax) / (2*ThrTimeOff);
+      /* 0.25 1.5 */
       double H_time = 0.01;
-      double F_Sec_Off = 5;
+      /* Счетчик вкл выкл и общего времени работы*/
       long i;
       double ff = SimTime;
          if (Thr->PulseWidthCmd > 0) {
+            if(Thr->OnOff == 0){
+            Thr->Inclusions = Thr->Inclusions + 1;
+            Thr->OnOff = 1;
+            }
             Thr->TimeOff = 0;
-            Thr->TimeOn = Thr->TimeOn + H_time;
-            Thr->F = sqrt(2*F_Sec_On*Thr->TimeOn);
-            Thr->Fuel_treb = 0.1;
+            Thr->TimeOn = Thr->TimeOn + DT;
+            Thr->F = sqrt(2*FSecOn*Thr->TimeOn);
+            Thr->FuelConsumption = Thr->F / 450;
             if (Thr->F > Thr->Fmax) {
                 Thr->F = Thr->Fmax;
             }
+            Thr->F_Off = Thr->F;
 
          }
-         if (Thr->PulseWidthCmd <= 0){
+         if (Thr->PulseWidthCmd <= 0 && Thr->Inclusions > 0){
+            Thr->OnOff = 0;
             Thr->TimeOn = 0;
             Thr->TimeOff = Thr->TimeOff + H_time;
-            Thr->F = -sqrt(2*F_Sec_Off*Thr->TimeOff) + Thr->Fmax;
+            Thr->F = -sqrt(2*FSecOff*Thr->TimeOff) + Thr->F_Off;
             if (Thr->F < 0) {
                 Thr->F = 0;
             }
@@ -35,7 +44,7 @@ void precitionThrModel(struct ThrType *Thr,struct SCType *S)
       Thr->Frc[2] = Thr->F*Thr->A[2];
 
       B = &S->B[Thr->Body];
-      B->Fuel = B->Fuel + Thr->Fuel_treb*H_time;
+      B->Fuel = B->Fuel + Thr->FuelConsumption*DT;
       N = &B->Node[Thr->Node];
 
       VxV(N->PosCm,Thr->Frc,Thr->Trq);
@@ -45,5 +54,15 @@ void precitionThrModel(struct ThrType *Thr,struct SCType *S)
             N->Trq[i] += Thr->Trq[i];
             N->Frc[i] += Thr->Frc[i];
          }
+      }
+}
+void THRProcessing(struct AcType *AC)
+{
+      struct AcThrType *W;
+      long Iw;
+
+      for(Iw=0;Iw<AC->Nthr;Iw++) {
+         W = &AC->Thr[Iw];
+         W->PulseWidthCmd = -Limit(-VoV(AC->Tcmd,W->rxA),-W->Fmax,W->Fmax);
       }
 }

@@ -41,7 +41,7 @@ void EasySunMode(struct SCType *S){
        C.fvb[0]=0; C.fvb[1]=0; C.fvb[2]=1;
        for(i=0;i<3;i++){
            C.AngRateGain[i] = 7.0;
-           C.AngGain[i] = 0.5;
+           C.AngGain[i] = 1;
        }
           /*FindPDGains(AC->MOI[i][i],0.1,0.7,
                       &C.AngRateGain[i],&C.AngGain[i]);*/
