@@ -1,7 +1,13 @@
-/*    Code by Alexsandr Kulakov                              */
+/* Created by Kulakov Aleksandr, russ69@bk.ru
+ * This file contains the naive supply power system of SC.
+ * This file is compatible with 42.
+ * https://github.com/ericstoneking/42
+ * But have specific git repo
+ * https://github.com/AlexKulov/42shell
+ */
 
 #include "42.h"
-#include "modelSPS.h"
+#include "SPSModel.h"
 extern FILE *FileRead(const char *Path, const char *File);
 
 #define MONTH_SEC (2592000) //30 дней
@@ -96,7 +102,7 @@ static void CalcUIAb(double Pt, double *I, double * U)
 
 static SupplyPowerSystemType * SPS[32];
 static long Nsps;
-void InitSpsModel(char * ScLabel){
+void InitSPSModel(char * ScLabel){
     char junk[120],newline;
     char spsFileName[40];
     sprintf(spsFileName, "SPS_%s.txt", ScLabel);
@@ -172,6 +178,7 @@ void InitSpsModel(char * ScLabel){
                 fscanf(spsFile,"%lf %[^\n] %[\n]",&SPSyst->Bat[Ie].MaxIdischarge,junk,&newline);
             }
         }
+        fclose(spsFile);
     }
 }
 
@@ -186,7 +193,7 @@ static SupplyPowerSystemType * getScSps(struct SCType *S){
     }
     return NULL;
 }
-int SpsModel(struct SCType *S){
+int SPSModel(struct SCType *S){
     //----------------- Выбираем соответствующую СЭП
     SupplyPowerSystemType * SPSyst = getScSps(S);//S->SPS;
     if(SPSyst == NULL)

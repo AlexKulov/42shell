@@ -64,7 +64,8 @@ MainWindow::~MainWindow()
 extern "C"{
 #endif
 #include "42.h"
-#include "modelSPS.h"
+#include "SPSModel.h"
+#include "PSModel.h"
 #include "../42add/serviceAlg.h"
 extern int exec(int argc,char **argv);
 
@@ -77,13 +78,13 @@ extern double modeAng[3];
 void ToPlot(double SimTime){
     mSimTime = SimTime;
     static unsigned int PlotSampleCounter=0;
-    static unsigned int PlotMaxCounter = 25;
+    static unsigned int PlotMaxCounter = 0;
 
     PlotSampleCounter++;
     if(PlotSampleCounter>PlotMaxCounter){
         PlotSampleCounter = 0;
         if(true){
-            static double angLimit = 5;
+            static double angLimit = 180;
             modeAng[0] = Limit(modeAng[0], -angLimit, angLimit);
             extUi->Plot11->graph(0)->addData(SimTime,modeAng[0]);
             modeAng[1] = Limit(modeAng[1], -angLimit, angLimit);
@@ -95,22 +96,35 @@ void ToPlot(double SimTime){
         }
 
         if(true){
-            extUi->Plot12->graph(0)->addData(SimTime,SC[0].B[0].wn[0]);
-            extUi->Plot12->graph(1)->addData(SimTime,SC[0].B[0].wn[1]);
-            extUi->Plot12->graph(2)->addData(SimTime,SC[0].B[0].wn[2]);
+            extUi->Plot12->graph(0)->addData(SimTime,SC[0].Thr[0].PulseWidthCmd);
+            //extUi->Plot12->graph(1)->addData(SimTime,SC[0].B[0].wn[1]);
+            //extUi->Plot12->graph(2)->addData(SimTime,SC[0].B[0].wn[2]);
             extUi->Plot12->rescaleAxes();
             extUi->Plot12->replot();
         }
 
         if(true){
-            if(SC[0].Nw > 0)
-                extUi->Plot13->graph(0)->addData(SimTime,SC[0].Whl[0].Trq);
-            if(SC[0].Nw > 1)
-                extUi->Plot13->graph(1)->addData(SimTime,SC[0].Whl[1].Trq);
-            if(SC[0].Nw > 2)
-                extUi->Plot13->graph(2)->addData(SimTime,SC[0].Whl[2].Trq);
-            if(SC[0].Nw > 3)
-                extUi->Plot13->graph(3)->addData(SimTime,SC[0].Whl[3].Trq);
+            if(false){
+                if(SC[0].Nw > 0)
+                    extUi->Plot13->graph(0)->addData(SimTime,SC[0].Whl[0].Trq);
+                if(SC[0].Nw > 1)
+                    extUi->Plot13->graph(1)->addData(SimTime,SC[0].Whl[1].Trq);
+                if(SC[0].Nw > 2)
+                    extUi->Plot13->graph(2)->addData(SimTime,SC[0].Whl[2].Trq);
+                if(SC[0].Nw > 3)
+                    extUi->Plot13->graph(3)->addData(SimTime,SC[0].Whl[3].Trq);
+            }
+            else if(true){
+                if(SC[0].Nthr > 0)
+                    extUi->Plot13->graph(0)->addData(SimTime,SC[0].Thr[0].F);
+                if(SC[0].Nthr > 1)
+                    extUi->Plot13->graph(1)->addData(SimTime,SC[0].Thr[1].F);
+                if(SC[0].Nthr > 2)
+                    extUi->Plot13->graph(2)->addData(SimTime,SC[0].Thr[2].F);
+                if(SC[0].Nthr > 4)
+                    extUi->Plot13->graph(3)->addData(SimTime,SC[0].Thr[4].F);
+            }
+
             extUi->Plot13->rescaleAxes();
             extUi->Plot13->replot();
         }
@@ -139,8 +153,9 @@ void ToPlot(double SimTime){
             extUi->Plot22->replot();
         }
 
-        if(false){
-            extUi->Plot31->graph(0)->addData(SimTime, 0);
+        if(true){
+            double fuelMassa = getThrsFuel(&SC[0],0);
+            extUi->Plot31->graph(0)->addData(SimTime, fuelMassa);
             extUi->Plot31->rescaleAxes();
             extUi->Plot31->replot();
         }

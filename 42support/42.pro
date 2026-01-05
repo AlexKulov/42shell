@@ -86,12 +86,14 @@ SOURCES += \
         #../42/Source/42init.c \
         ../42/Source/42fsw.c \
         ../42/Source/42cmd.c \
+    ../42add/PSModel.c \
+    ../42add/SPSModel.c \
+    ../42add/fswAlg.c \
+    ../42add/fswMode.c \
         ../42change/Source/42init.c \
+    ../42change/Source/shActuators.c \
         ../42change/Source/shFsw.c \
         ../42change/Source/shIokit.c \
-        ../42add/serviceAlg.c \
-        ../42add/simplestMode.c \
-        ../42add/modelSPS.c \
     ../42change/Source/shExec.c \
     ../42add/orbControl.c
 

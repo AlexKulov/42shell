@@ -1,10 +1,13 @@
 /* Created by Kulakov Aleksandr, russ69@bk.ru
- * This file contains the functions of simplest attitude mode.
+ * This file contains only the attitude mode.
  * This file is compatible with 42.
  * https://github.com/ericstoneking/42
+ * But have specific git repo
+ * https://github.com/AlexKulov/42shell
  */
 #include "42.h"
-#include "serviceAlg.h"
+#include "fswAlg.h"
+#include "fswMode.h"
 
 extern void GyroProcessing(struct AcType *AC);
 extern void StarTrackerProcessing(struct AcType *AC);
@@ -114,8 +117,10 @@ void EasyLvlhMode(struct SCType *S){
       /* PD Control */
       for(i=0;i<3;i++) {
           C->Tcmd[i] = -C->Kr[i]*(AC->wbn[i]-wlb[i])-C->Kp[i]*(2.0*qbr[i]);
-          AC->Whl[i].Tcmd = -C->Tcmd[i];
+          //AC->Whl[i].Tcmd = -C->Tcmd[i];
+          AC->Tcmd[i] = C->Tcmd[i];
       }
+      WheelProcessing(AC);
 
       /* Momentum Management */
       if(AC->Nmtb == 3){
@@ -192,71 +197,6 @@ void NadirMode(struct SCType *S){
 /**********************************************************************/
 /**********************************************************************/
 /*                    Pointing Orientation                            */
-void SUMMV(const double a[3], const double b[3], double c[3]){
-    c[0]=a[0]+b[0];
-    c[1]=a[1]+b[1];
-    c[2]=a[2]+b[2];
-}
-
-static void FindNWref (double ScRi[3], const double ScVi[3], const double PointRi[3],
-                 double nref[3], double wref[3], double dwref[3])
- {
-    static double Wz[3] = {0,0,7.292115E-5}; //скорость вращения Земли
-    #define mu_g (398600.4415888889) // постоянная
-    double R3 = MAGV(ScRi);
-    R3 = R3*R3*R3;
-
-    double _PointR[3]={-PointRi[0], -PointRi[1], -PointRi[2]};
-    //MTxV(Cie,PointRz,PointRi);
-    double dR[3] = {0,0,0};
-    SUMMV(ScRi, _PointR, dR); //Ri - Cie.tr() * Rze;   //  NPU to c.m.
-
-    double _PointVi[3] = {0,0,0};
-    VxV(Wz,_PointR,_PointVi); //на самом деле -PointVi, т.к. -PointRi
-    double dV[3] = {0,0,0}; //= Vi - Wz.cross(Cie.tr()*Rze);
-    SUMMV(ScVi, _PointVi, dV);
-
-    double ScA[3] = {0,0,0};
-    SxV(-mu_g/R3, ScRi,ScA);
-
-    double _PointA[3] = {0,0,0};
-    VxV(Wz,_PointVi,_PointA);
-    double da[3] = {0,0,0}; //Ri * (-mu_g/R3) - Wz.cross(Wz.cross(Cie.tr()*Rze))
-    SUMMV(ScA, _PointA, da);
-
-    double nr = MAGV(dR);//= dR.getNorm();
-
-    double dnref[3] = {0,0,0}, d2nref[3] = {0,0,0};
-    double tau[3] = {0,0,0}, dtau[3] = {0,0,0};
-    SxV(1/nr, dV, tau);//tau = dV / nr;
-    SxV(1/nr, dR, nref);//nref = dR / nr;
-    double ndt = VoV(nref,tau);//ndt = nref.dot(tau);
-    double da_nr[3] = {0,0,0};
-    SxV(1/nr, da, da_nr);
-    double _ndtXtau[3] = {0,0,0};
-    SxV(-ndt, tau, _ndtXtau);
-    SUMMV(da_nr,_ndtXtau,dtau);//dtau = da / nr - tau*ndt;
-
-    double _ndtXnref[3] = {0,0,0};
-    SxV(-ndt, nref, _ndtXnref);
-    SUMMV(tau,_ndtXnref,dnref);//dnref = tau - nref*ndt;
-
-    double dtau_dnrefXndt[3] = {0,0,0}, _nrefX[3] = {0,0,0};
-    double _ndtXdnref[3] = {0,0,0};
-    SxV(-ndt, dnref, _ndtXdnref);
-    SUMMV(dtau,_ndtXdnref,dtau_dnrefXndt);
-    double dot = VoV(dnref,tau);
-            dot = dot + VoV(nref,dtau);
-    SxV(-dot,nref,_nrefX);
-    //d2nref = dtau - dnref*ndt - nref*(dnref.dot(tau) + nref.dot(dtau));
-    SUMMV(dtau_dnrefXndt,_nrefX,d2nref);
-
-    VxV(nref,dnref,wref); //wref = nref.cross(dnref);
-    VxV(nref,d2nref,dwref); //dwref = nref.cross(d2nref);
-
-    #undef mu_g
- }
-
 void PointOrientation(struct SCType *S)
 {
     struct AcType *AC;
@@ -348,4 +288,106 @@ void PointOrientation(struct SCType *S)
         AC->MTB[i].Mcmd = Kunl*HxB[i];
     }
     #endif
+}
+
+/**********************************************************************/
+/**********************************************************************/
+/*                       Thruster Mode                                */
+void ThrLvlhMode(struct SCType *S){
+    double wln[3],CRN[3][3];
+    double qrn[4],qbr[4];
+    long i;
+    struct AcType *AC;
+    struct AcThreeAxisCtrlType *C;
+
+    AC = &S->AC;
+    C = &AC->ThreeAxisCtrl;
+    struct CmdType * Cmd = &AC->Cmd;
+
+    if (C->Init) {
+        C->Init = 0;
+        for(i=0;i<3;i++) {
+            C->Kr[i] = AC->MOI[i][i] * 0.55;
+            C->Kp[i] = AC->MOI[i][i] * 0.75;
+        }
+
+        //C->Kunl = 1.0E6;
+        Cmd->qrl[0] = 1; Cmd->qrl[1] = 0;
+        Cmd->qrl[2] = 0; Cmd->qrl[3] = 0;
+        /* Chek sensors and actuators */
+        if(AC->Nst == 0 || AC->Ngps==0 || AC->Ngyro<3){
+            printf("EasyLvlhMode: check SC sensors, Nst=%li, Ngps=%li, Ngyro=%li\n",
+                   AC->Nst, AC->Ngps, AC->Ngyro);
+        }
+        if(AC->Nmtb > 0 && AC->Nmtb != 3){
+            printf("EasyLvlhMode: check MTBs, Nmtb=%li\n", AC->Nmtb);
+        }
+
+    }
+    /* .. Sensor Processing */
+    GyroProcessing(AC);
+    GpsProcessing(AC);
+    StarTrackerProcessing(AC);
+
+    /* Find Attitude Command */
+    FindCLN(AC->PosN,AC->VelN,CRN,wln);
+    C2Q(CRN,qrn);
+
+    /* Form Error Signals */
+
+    double qln[4] = {1,0,0,0};
+    if(Cmd->Parm == PARM_EULER_ANGLES) {
+        double DC[3][3] = {0};
+        A2C(Cmd->RotSeq,Cmd->Ang[0],Cmd->Ang[1],Cmd->Ang[2],DC);
+        if (Cmd->Frame == FRAME_L){
+            C2Q(DC,Cmd->qrl);
+        }
+        else{
+            Cmd->qrl[0] = 1; Cmd->qrl[1] = 0;
+            Cmd->qrl[2] = 0; Cmd->qrl[3] = 0;
+        }
+        QxQ(Cmd->qrl,qrn, qln);
+        QxQT(AC->qbn,qln,qbr);
+    }
+    else{
+        QxQT(AC->qbn,qrn,qbr);
+    }
+    RECTIFYQ(qbr);
+
+    double wlb[3]={0,0,0};
+    QTxV(qbr,wln,wlb);
+
+    /* PD Control */
+    static long wasChangePD = 0;
+    double therr[3] = {0};
+    Q2AngleVec(qbr, therr);
+    for(i=0;i<3;i++){
+        if(fabs(therr[i]) > 5*D2R){
+            break;
+        }
+    }
+    if(i==3 && wasChangePD){
+        for(i=0;i<3;i++) {
+            C->Kr[i] = AC->MOI[i][i] * 0.55;
+        }
+        wasChangePD = 0;
+    }
+    else if(i<3 && !wasChangePD){
+        for(i=0;i<3;i++) {
+            C->Kr[i] = AC->MOI[i][i] * 5.5;
+        }
+        wasChangePD = 1;
+    }
+
+    for(i=0;i<3;i++) {
+        C->Tcmd[i] = -C->Kr[i]*(AC->wbn[i]-wlb[i])-C->Kp[i]*(therr[i]); //2.0*qbr[i]
+        AC->Tcmd[i] = C->Tcmd[i];
+    }
+
+    ThrProcessing(AC, 0, 4);
+
+    double angV[3];
+    Q2AngleVec(qbr,angV);
+    for(i=0;i<3;i++)
+        modeAng[i] = angV[i]*R2D;
 }

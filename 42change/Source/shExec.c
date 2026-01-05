@@ -16,7 +16,8 @@
 #include "42.h"
 #undef DECLARE_GLOBALS
 #include "shHeaders.h"
-#include "modelSPS.h"
+#include "SPSModel.h"
+#include "PSModel.h"
 
 /* #ifdef __cplusplus
 ** namespace _42 {
@@ -367,6 +368,7 @@ static void shFeakReport(){
 }
 
 extern void shFlightSoftWare(struct SCType *S);
+extern void shActuators(struct SCType *S);
 
 long SimStep(void)
 {
@@ -393,9 +395,10 @@ long SimStep(void)
                Perturbations(S);  /* Environmental Forces and Torques */
                Sensors(S);
                shFlightSoftWare(S);
+               initPSModel(S);
                Actuators(S);
                PartitionForces(S); /* Orbit-affecting and "internal" */
-               InitSpsModel(S->Label);
+               InitSPSModel(S->Label);
             }
          }
          shFeakReport();  /* File Output */
@@ -427,8 +430,8 @@ long SimStep(void)
             Perturbations(S);  /* Environmental Forces and Torques */
             Sensors(S);
             shFlightSoftWare(S);
-            Actuators(S);
-            SpsModel(S);
+            shActuators(S);
+            SPSModel(S);
             PartitionForces(S); /* Orbit-affecting and "internal" */
          }
       }
