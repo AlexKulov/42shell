@@ -3,8 +3,8 @@ void PrecitionThrModel(struct ThrType *Thr,struct SCType *S,double DT)
 {
       struct BodyType *B;
       struct NodeType *N;
-      double ThrTimeOn = 0.25;
-      double ThrTimeOff = 1.5;
+      double ThrTimeOn = 1;
+      double ThrTimeOff = 2;
       double FSecOn = (Thr->Fmax * Thr->Fmax) / (2*ThrTimeOn);
       double FSecOff = (Thr->Fmax * Thr->Fmax) / (2*ThrTimeOff);
       /* 0.25 1.5 */
@@ -18,7 +18,8 @@ void PrecitionThrModel(struct ThrType *Thr,struct SCType *S,double DT)
             Thr->OnOff = 1;
             }
             Thr->TimeOff = 0;
-            Thr->TimeOn = Thr->TimeOn + DT;
+            Thr->TimeOn += DT;
+            /*Thr->F = Thr->F + sqrt(2*FSecOn*Thr->TimeOn)*DT;*/
             Thr->F = sqrt(2*FSecOn*Thr->TimeOn);
             Thr->FuelConsumption = Thr->F / 450;
             if (Thr->F > Thr->Fmax) {
@@ -30,11 +31,12 @@ void PrecitionThrModel(struct ThrType *Thr,struct SCType *S,double DT)
          if (Thr->PulseWidthCmd <= 0 && Thr->Inclusions > 0){
             Thr->OnOff = 0;
             Thr->TimeOn = 0;
-            Thr->TimeOff = Thr->TimeOff + H_time;
+            Thr->TimeOff += DT;
             Thr->F = -sqrt(2*FSecOff*Thr->TimeOff) + Thr->F_Off;
             if (Thr->F < 0) {
                 Thr->F = 0;
             }
+            Thr->F_On = Thr->F;
          }
       /*if (Thr->F < 0.0) Thr->F = 0.0;*/
       /*if (Thr->F > Thr->Fmax) Thr->F = Thr->Fmax;*/

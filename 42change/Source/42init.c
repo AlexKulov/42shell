@@ -14,8 +14,7 @@
 
 #include "42.h"
 #include <ctype.h>
-#include "shDefines.h"
-extern FILE *FileRead(const char *Path, const char *File);
+#include "shHeaders.h"
 
 /* #ifdef __cplusplus
 ** namespace _42 {

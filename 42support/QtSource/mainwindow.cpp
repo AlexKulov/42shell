@@ -14,56 +14,41 @@ ui(new Ui::MainWindow)
     setupPlots();
 
     ui->Plot11->addGraph();
-    ui->Plot11->graph(0)->setPen(QColor(Qt::green));
+    ui->Plot11->graph(0)->setPen(QColor(Qt::red));
     ui->Plot11->addGraph();
-    ui->Plot11->graph(1)->setPen(QColor(Qt::red));
+    ui->Plot11->graph(1)->setPen(QColor(Qt::green));
     ui->Plot11->addGraph();
     ui->Plot11->graph(2)->setPen(QColor(Qt::blue));
 
-
     ui->Plot12->addGraph();
-    ui->Plot12->graph(0)->setPen(QColor(Qt::green));
+    ui->Plot12->graph(0)->setPen(QColor(Qt::red));
     ui->Plot12->addGraph();
-    ui->Plot12->graph(1)->setPen(QColor(Qt::red));
-
+    ui->Plot12->graph(1)->setPen(QColor(Qt::green));
+    ui->Plot12->addGraph();
+    ui->Plot12->graph(2)->setPen(QColor(Qt::blue));
 
     ui->Plot13->addGraph();
-    ui->Plot13->graph(0)->setPen(QColor(Qt::green));
+    ui->Plot13->graph(0)->setPen(QColor(Qt::red));
     ui->Plot13->addGraph();
-    ui->Plot13->graph(1)->setPen(QColor(Qt::red));
+    ui->Plot13->graph(1)->setPen(QColor(Qt::green));
     ui->Plot13->addGraph();
+    ui->Plot13->graph(2)->setPen(QColor(Qt::blue));
+    ui->Plot13->addGraph();
+    ui->Plot13->graph(3)->setPen(QColor(Qt::yellow));
 
-
-    ui->Plot21->addGraph();
+    ui->Plot21->addGraph(); //plotKm
     ui->Plot21->graph(0)->setPen(QColor(Qt::red));
-    ui->Plot21->addGraph();
-    ui->Plot21->graph(1)->setPen(QColor(Qt::green));
-    ui->Plot21->addGraph();
-    ui->Plot21->graph(2)->setPen(QColor(Qt::blue));
-
-
-    ui->Plot22->addGraph();
+    ui->Plot21->addGraph(); //plotKm
+    ui->Plot21->graph(1)->setPen(QColor(Qt::blue));
+    ui->Plot22->addGraph();//plotWheelPower
     ui->Plot22->graph(0)->setPen(QColor(Qt::red));
-    ui->Plot22->addGraph();
-    ui->Plot22->graph(1)->setPen(QColor(Qt::green));
-    ui->Plot22->addGraph();
-    ui->Plot22->graph(2)->setPen(QColor(Qt::blue));
+    ui->Plot22->addGraph(); //plotKm
+    ui->Plot22->graph(1)->setPen(QColor(Qt::blue));
 
-
-    ui->Plot31->addGraph(); //plotKm
+    ui->Plot31->addGraph();//plotScMode
     ui->Plot31->graph(0)->setPen(QColor(Qt::red));
-    ui->Plot31->addGraph(); //plotKm
-    ui->Plot31->graph(1)->setPen(QColor(Qt::green));
-    ui->Plot31->addGraph(); //plotKm
-    ui->Plot31->graph(2)->setPen(QColor(Qt::blue));
-
-
-    ui->Plot32->addGraph();
+    ui->Plot32->addGraph();//plotWorkAndZRV
     ui->Plot32->graph(0)->setPen(QColor(Qt::red));
-    ui->Plot32->addGraph();
-    ui->Plot32->graph(1)->setPen(QColor(Qt::green));
-    ui->Plot32->addGraph();
-    ui->Plot32->graph(2)->setPen(QColor(Qt::blue));
 
     uiPlotSampleCounter=0;
     uiPlotMaxCounter = 10;
@@ -79,7 +64,9 @@ MainWindow::~MainWindow()
 extern "C"{
 #endif
 #include "42.h"
-#include "../cAlgorithms/serviceAlg.h"
+#include "SPSModel.h"
+#include "PSModel.h"
+#include "../42add/serviceAlg.h"
 extern int exec(int argc,char **argv);
 
 void ToPlot(double Time);
@@ -91,60 +78,90 @@ extern double modeAng[3];
 void ToPlot(double SimTime){
     mSimTime = SimTime;
     static unsigned int PlotSampleCounter=0;
-    static unsigned int PlotMaxCounter = 10;
+    static unsigned int PlotMaxCounter = 0;
 
     PlotSampleCounter++;
     if(PlotSampleCounter>PlotMaxCounter){
         PlotSampleCounter = 0;
         if(true){
-            extUi->Plot11->graph(0)->addData(SimTime,SC[0].Thr[0].F);
-            extUi->Plot11->graph(1)->addData(SimTime,SC[0].Thr[1].F);
+            static double angLimit = 180;
+            modeAng[0] = Limit(modeAng[0], -angLimit, angLimit);
+            extUi->Plot11->graph(0)->addData(SimTime,modeAng[0]);
+            modeAng[1] = Limit(modeAng[1], -angLimit, angLimit);
+            extUi->Plot11->graph(1)->addData(SimTime,modeAng[1]);
+            modeAng[2] = Limit(modeAng[2], -angLimit, angLimit);
+            extUi->Plot11->graph(2)->addData(SimTime,modeAng[2]);
             extUi->Plot11->rescaleAxes();
             extUi->Plot11->replot();
         }
 
         if(true){
-            extUi->Plot12->graph(0)->addData(SimTime,SC[0].Thr[2].F);
-            extUi->Plot12->graph(1)->addData(SimTime,SC[0].Thr[3].F);
+            extUi->Plot12->graph(0)->addData(SimTime,SC[0].Thr[0].PulseWidthCmd);
+            //extUi->Plot12->graph(1)->addData(SimTime,SC[0].B[0].wn[1]);
+            //extUi->Plot12->graph(2)->addData(SimTime,SC[0].B[0].wn[2]);
             extUi->Plot12->rescaleAxes();
             extUi->Plot12->replot();
         }
 
         if(true){
-            extUi->Plot13->graph(0)->addData(SimTime,SC[0].Thr[4].F);
-            extUi->Plot13->graph(1)->addData(SimTime,SC[0].Thr[5].F);
+            if(false){
+                if(SC[0].Nw > 0)
+                    extUi->Plot13->graph(0)->addData(SimTime,SC[0].Whl[0].Trq);
+                if(SC[0].Nw > 1)
+                    extUi->Plot13->graph(1)->addData(SimTime,SC[0].Whl[1].Trq);
+                if(SC[0].Nw > 2)
+                    extUi->Plot13->graph(2)->addData(SimTime,SC[0].Whl[2].Trq);
+                if(SC[0].Nw > 3)
+                    extUi->Plot13->graph(3)->addData(SimTime,SC[0].Whl[3].Trq);
+            }
+            else if(true){
+                if(SC[0].Nthr > 0)
+                    extUi->Plot13->graph(0)->addData(SimTime,SC[0].Thr[0].F);
+                if(SC[0].Nthr > 1)
+                    extUi->Plot13->graph(1)->addData(SimTime,SC[0].Thr[1].F);
+                if(SC[0].Nthr > 2)
+                    extUi->Plot13->graph(2)->addData(SimTime,SC[0].Thr[2].F);
+                if(SC[0].Nthr > 4)
+                    extUi->Plot13->graph(3)->addData(SimTime,SC[0].Thr[4].F);
+            }
+
             extUi->Plot13->rescaleAxes();
             extUi->Plot13->replot();
         }
 
         if(true){
-            extUi->Plot21->graph(0)->addData(SimTime,SC[0].B[0].Trq[0]);
-            extUi->Plot21->graph(1)->addData(SimTime,SC[0].B[0].Trq[1]);
-            extUi->Plot21->graph(2)->addData(SimTime,SC[0].B[0].Trq[2]); //SC[0].B[0].wn[2]
+            double posN0 = 0;
+            double posN1 = 0;
+            posN0 = MAGV(SC[0].PosN) - World[EARTH].rad;
+            if(Nsc>1)
+                posN1 = MAGV(SC[1].PosN) - World[EARTH].rad;
+            extUi->Plot21->graph(0)->addData(SimTime, posN1/1000);
+            extUi->Plot21->graph(1)->addData(SimTime, posN0/1000);
             extUi->Plot21->rescaleAxes();
             extUi->Plot21->replot();
         }
 
         if(true){
-            extUi->Plot22->graph(0)->addData(SimTime,SC[0].B[0].wn[0]); //SC[0].VelR[0]
-            extUi->Plot22->graph(1)->addData(SimTime,SC[0].B[0].wn[1]);
-            extUi->Plot22->graph(2)->addData(SimTime,SC[0].B[0].wn[2]);
+            double magVelN0 = 0;
+            double magVelN1 = 0;
+            magVelN0 = MAGV(SC[0].VelN)/1000;
+            if(Nsc>1)
+                magVelN1 = MAGV(SC[1].VelN)/1000;
+            extUi->Plot22->graph(0)->addData(SimTime, magVelN1);
+            extUi->Plot22->graph(1)->addData(SimTime, magVelN0);
             extUi->Plot22->rescaleAxes();
             extUi->Plot22->replot();
         }
 
         if(true){
-            double magPosN = MAGV(SC[0].PosN);
-            extUi->Plot31->graph(0)->addData(SimTime,SC[0].B->Fuel);
-            //extUi->Plot31->graph(1)->addData(SimTime,SC[0].PosN[1]);
-            //extUi->Plot31->graph(2)->addData(SimTime,SC[0].PosN[2]);
+            double fuelMassa = getThrsFuel(&SC[0],0);
+            extUi->Plot31->graph(0)->addData(SimTime, fuelMassa);
             extUi->Plot31->rescaleAxes();
             extUi->Plot31->replot();
         }
 
         if(true){
-            extUi->Plot32->graph(1)->addData(SimTime,SC[0].VelR[0]);
-            extUi->Plot32->graph(2)->addData(SimTime,SC[0].VelEH[0]);
+            extUi->Plot32->graph(0)->addData(SimTime, SC[0].Eclipse);
             extUi->Plot32->rescaleAxes();
             extUi->Plot32->replot();
         }

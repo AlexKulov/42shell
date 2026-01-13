@@ -1,4 +1,3 @@
-#Test
 QT -= gui
 
 CONFIG += console
@@ -57,8 +56,8 @@ CONFIG += 42GUI
 }
 
 INCLUDEPATH +=../42/Include \
-              ../42change/Include \
-              ../42/Kit/Include
+              ../42/Kit/Include \
+              ../42add
 
 SOURCES += \
         ../42/Kit/Source/dcmkit.c \
@@ -87,13 +86,17 @@ SOURCES += \
         #../42/Source/42init.c \
         ../42/Source/42fsw.c \
         ../42/Source/42cmd.c \
+    ../42add/PSModel.c \
+    ../42add/SPSModel.c \
+    ../42add/fswAlg.c \
+    ../42add/fswMode.c \
         ../42change/Source/42init.c \
+    ../42change/Source/shActuators.c \
         ../42change/Source/shFsw.c \
         ../42change/Source/shIokit.c \
-        ../42change/Source/42exec.c \
-        ../42change/Source/thrModel.c \
-        ../cAlgorithms/serviceAlg.c \
-        ../cAlgorithms/simplestMode.c
+    ../42change/Source/shExec.c \
+    ../42add/orbControl.c \
+    ../42change/Source/thrModel.c
 
 #42 version after 27.03.25
 CONFIG += IPC_OVERHAUL

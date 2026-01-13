@@ -13,10 +13,11 @@
 
 
 #include "42.h"
-#include "shDefines.h"
+#include "shHeaders.h"
+#include "fswMode.h"
 
-void AcFsw(struct AcType *AC);
-void WriteToSocket(SOCKET Socket, char **Prefix, long Nprefix, long EchoEnabled);
+extern void AcFsw(struct AcType *AC);
+//extern void WriteToSocket(SOCKET Socket, char **Prefix, long Nprefix, long EchoEnabled);
 
 /* #ifdef __cplusplus
 ** namespace _42 {
@@ -30,11 +31,9 @@ void WriteToSocket(SOCKET Socket, char **Prefix, long Nprefix, long EchoEnabled)
 /*  and failure detection and correction all fall within the scope of */
 /*  this file.                                                        */
 /**********************************************************************/
-extern void EasySunMode(struct SCType *S);
-extern void EasyLvlhMode(struct SCType *S);
-extern void PointOrientation(struct SCType *S);
-extern void NadirMode(struct SCType *S);
+
 extern void MapCmdsToActuators(struct SCType *S);
+extern void thrControl(struct SCType *S);
 void shFlightSoftWare(struct SCType *S)
 {
       #ifdef _AC_STANDALONE_
@@ -64,11 +63,12 @@ void shFlightSoftWare(struct SCType *S)
             case NADIR_FSW:
                 NadirMode(S);
                 break;
-
+            case THR_FSW:
+                ThrLvlhMode(S);
+                break;
          }
-         
+
       }
-      
       MapCmdsToActuators(S);
 }
 

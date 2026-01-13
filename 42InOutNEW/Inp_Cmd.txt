@@ -1,8 +1,22 @@
 <<<<<<<<<<<<<<<<<  42:  Command Script File  >>>>>>>>>>>>>>>>>
 0.0 SC[0] qrn = [0.0  0.0  0.0  1.0]
-#40.0 SC[0].AC.Thr[0].PulseWidthCmd = 10.0
-#160.0 SC[0].AC.Thr[0].PulseWidthCmd = 0.0
-5.0 SC[0] FswTag = SUN_FSW 
+10.0 SC[0].AC.Thr[0].PulseWidthCmd = 10.0
+20.0 SC[0].AC.Thr[0].PulseWidthCmd = 0.0
+40.0 SC[0].AC.Thr[0].PulseWidthCmd = 10.0
+41.0 SC[0].AC.Thr[0].PulseWidthCmd = 0.0
+42.0 SC[0].AC.Thr[0].PulseWidthCmd = 10.0
+42.1 SC[0].AC.Thr[0].PulseWidthCmd = 0.0
+42.3 SC[0].AC.Thr[0].PulseWidthCmd = 10.0
+42.4 SC[0].AC.Thr[0].PulseWidthCmd = 0.0
+42.6 SC[0].AC.Thr[0].PulseWidthCmd = 10.0
+43.0 SC[0].AC.Thr[0].PulseWidthCmd = 0.0
+46.0 SC[0].AC.Thr[0].PulseWidthCmd = 10.0
+47.0 SC[0].AC.Thr[0].PulseWidthCmd = 0.0
+49.0 SC[0].AC.Thr[0].PulseWidthCmd = 10.0
+49.6 SC[0].AC.Thr[0].PulseWidthCmd = 0.0
+50.0 SC[0].AC.Thr[0].PulseWidthCmd = 10.0
+50.6 SC[0].AC.Thr[0].PulseWidthCmd = 0.0
+#5.0 SC[0] FswTag = SUN_FSW 
 
 
 EOF
