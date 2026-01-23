@@ -14,8 +14,9 @@ typedef struct ThrParameters{
     int Incs; // кол-во включений
     double Consumption; //потребление удельное
     double Isp; //удельный импульс в секундах
-    double OffF;
-    double TailF;
+    double OnF; //тяга после включения
+    double OffF;//тяга на моменет отключения
+    double TailF;//тяга последействия
     double StopStartTime;
     double OnTime;
     double OffTime;
@@ -136,22 +137,33 @@ long PSModel(struct SCType *S){
         struct BodyType *B;
         struct NodeType *N;
         ThrParameters * thr;
-        double testT = SimTime;
         for(long i=0; i<S->Nthr; i++){
             thr = &prop->Thrs[i];
             double F = 0;
             if (  thr->OffTime >= thr->StopStartTime &&
-                ((thr->Main->PulseWidthCmd >0                  && thr->Main->Mode == THR_PULSED) ||
-                 (thr->Main->ThrustLevelCmd>thr->MinThrottling && thr->Main->Mode == THR_PROPORTIONAL))) {
-                if(thr->IsOpen == 0){
+                ((thr->Main->Mode == THR_PULSED && thr->Main->PulseWidthCmd >0) ||
+                 (thr->Main->Mode == THR_PROPORTIONAL && thr->Main->ThrustLevelCmd>thr->MinThrottling))){
+                if(!thr->IsOpen){
                     thr->Incs++;
-                    thr->IsOpen = 1;
+                    thr->IsOpen = TRUE;
                     if(thr->Main->Mode == THR_PROPORTIONAL){
                         if(thr->Main->ThrustLevelCmd > thr->MaxThrottling){
                             thr->Main->ThrustLevelCmd = thr->MaxThrottling;
                         }
                     }
                 }
+            }
+            else{
+                if(thr->IsOpen){
+                    thr->OffTime = 0;
+                    thr->OffF = thr->OnF;
+                }
+                thr->IsOpen = FALSE;
+                thr->Consumption = 0;
+                thr->OnTime = 0;
+            }
+
+            if(thr->IsOpen){
                 thr->OnTime              += DTSIM;
                 thr->Main->PulseWidthCmd -= DTSIM;
                 F = sqrt(2*thr->FSecOn*thr->OnTime);
@@ -165,13 +177,11 @@ long PSModel(struct SCType *S){
                     }
                 }
                 thr->Consumption = F / thr->Isp;
-                thr->OffF = F;
+                thr->OnF = F;
             }
-            else if (thr->Incs > 0){
-                if(thr->IsOpen)
-                    thr->OffTime = 0;
-                thr->IsOpen = 0;
-                thr->OnTime = 0;
+
+            if ((!thr->IsOpen && thr->Incs > 0) ||
+                thr->TailF>0){
                 thr->OffTime += DTSIM;
                 F = -sqrt(2*thr->FSecOff*thr->OffTime) + thr->OffF;
                 if (F < 0) {
@@ -179,9 +189,13 @@ long PSModel(struct SCType *S){
                 }
                 thr->TailF = F;
             }
-            thr->Main->F = F;
-            /*if (Thr->F < 0.0) Thr->F = 0.0;*/
-            /*if (Thr->F > Thr->Fmax) Thr->F = Thr->Fmax;*/
+            if(thr->IsOpen){
+                thr->Main->F = thr->OnF + thr->TailF;
+                if(thr->Main->F>thr->Main->Fmax) //???
+                    thr->Main->F=thr->Main->Fmax;
+            }
+            else
+                thr->Main->F = thr->TailF;
 
             thr->Main->Frc[0] = F*thr->Main->A[0];
             thr->Main->Frc[1] = F*thr->Main->A[1];

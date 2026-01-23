@@ -4,7 +4,7 @@
 1                           ! Number of Thrs
 ==============================  Thr 0  =================================
 0.25                         ! Build-up time, sec.
-1.0                          ! Tailoff impulse time, sec.
+0.5                          ! Tailoff impulse time, sec.
 0.2                          ! Min stop-and-start time, sec.
 300                          ! Specific impulse, sec.
 100 100                      ! Min max throttling range, %
