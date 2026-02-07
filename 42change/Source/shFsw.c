@@ -34,6 +34,7 @@ extern void AcFsw(struct AcType *AC);
 
 extern void MapCmdsToActuators(struct SCType *S);
 extern void thrControl(struct SCType *S);
+extern void FlightSoftWare(struct SCType *S);
 void shFlightSoftWare(struct SCType *S)
 {
       #ifdef _AC_STANDALONE_
@@ -63,9 +64,16 @@ void shFlightSoftWare(struct SCType *S)
             case NADIR_FSW:
                 NadirMode(S);
                 break;
-            case THR_FSW:
+            case THR_LVLH_FSW:
                 ThrLvlhMode(S);
                 break;
+            default:
+                if(S->FswSampleCounter == 0)
+                    S->FswSampleCounter = S->FswMaxCounter;
+                else
+                    S->FswSampleCounter--;
+                FlightSoftWare(S);
+                return;
          }
 
       }

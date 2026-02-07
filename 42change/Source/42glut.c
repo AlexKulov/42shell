@@ -1001,8 +1001,8 @@ void InitCamWindow(void)
       #endif
       printf("Loading Cam Textures\n");
       LoadCamTextures();
-      printf("Loading 3D Noise\n");
-      Load3DNoise();
+      //printf("Loading 3D Noise\n");
+      //Load3DNoise();
       VREnabled = FALSE;
       SeeThruPassNeeded = FALSE;
       printf("Loading Cam Lists\n");
@@ -1091,7 +1091,7 @@ void InitMapWindow(void)
       World[LUNA].ColTexTag = PpmToTexTag("./World/",World[LUNA].ColTexFileName,3,GL_REPEAT);
       World[LUNA].BumpTexTag = PpmToTexTag("./World/",World[LUNA].BumpTexFileName,3,GL_REPEAT);
 
-      LogoTexTag = PpmToTexTag("./Model/","GlastLogo.ppm",3,GL_CLAMP);
+      //LogoTexTag = PpmToTexTag("./Model/","GlastLogo.ppm",3,GL_CLAMP);
       SunSpriteTexTag = PpmToTexTag("./Model/","SunSpriteAlpha.ppm",4,GL_CLAMP);
       AntiSunSpriteTexTag = PpmToTexTag("./Model/","AntiSunSpriteAlpha.ppm",4,GL_CLAMP);
       MoonSpriteTexTag = PpmToTexTag("./Model/","MoonSpriteAlpha.ppm",4,GL_CLAMP);

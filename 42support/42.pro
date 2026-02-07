@@ -3,7 +3,7 @@ QT -= gui
 CONFIG += console
 CONFIG -= app_bundle
 
-CONFIG += QTPLOT
+CONFIG -= QTPLOT
 QTPLOT {
     DEFINES += _USE_QTPLOT_
     QT += core gui widgets
@@ -63,7 +63,8 @@ SOURCES += \
         ../42/Kit/Source/dcmkit.c \
         ../42/Kit/Source/envkit.c \
         ../42/Kit/Source/fswkit.c \
-        ../42/Kit/Source/geomkit.c \
+        #../42/Kit/Source/geomkit.c \
+        ../42/Kit/Source/meshkit.c \
         ../42/Kit/Source/iokit.c \
         ../42/Kit/Source/mathkit.c \
         ../42/Kit/Source/msis86kit.c \

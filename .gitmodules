@@ -1,3 +1,6 @@
 [submodule "42"]
-	path = 42
-	url = https://github.com/ericstoneking/42.git
+	path = 42core
+	url = https://github.com/AlexKulov/42core
+[submodule "42core"]
+	path = 42core
+	url = https://github.com/AlexKulov/42core.git

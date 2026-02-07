@@ -1930,7 +1930,7 @@ void InitSpacecraft(struct SCType *S)
       struct AccelType *Accel;
       struct FgsType *Fgs;
       struct PsfType *PSF;
-      long OldNgeom;
+      long OldNmesh;
 
       infile=FileOpen(InOutPath,S->FileName,"r");
       fscanf(infile,"%[^\n] %[\n]",junk,&newline);
@@ -2092,7 +2092,7 @@ void InitSpacecraft(struct SCType *S)
                   &B->EmbeddedMom[1],&B->EmbeddedMom[2],junk,&newline);
          fscanf(infile,"%lf %lf %lf %[^\n] %[\n]",&B->EmbeddedDipole[0],
                   &B->EmbeddedDipole[1],&B->EmbeddedDipole[2],junk,&newline);
-         fscanf(infile,"%s %[^\n] %[\n]",B->GeomFileName,junk,&newline);
+         fscanf(infile,"%s %[^\n] %[\n]",B->MeshFileName,junk,&newline);
          fscanf(infile,"%s %[^\n] %[\n]",B->NodeFileName,junk,&newline);
          fscanf(infile,"%s %[^\n] %[\n]",B->FlexFileName,junk,&newline);
          if (S->RefPt == REFPT_JOINT)
@@ -2880,15 +2880,15 @@ void InitSpacecraft(struct SCType *S)
 
 /* .. Load geometry */
       for(j=0;j<S->Nb;j++) {
-         OldNgeom = Ngeom;
-         Geom = LoadWingsObjFile(ModelPath,S->B[j].GeomFileName,
-            &Matl,&Nmatl,Geom,&Ngeom,&S->B[j].GeomTag,
+         OldNmesh = Nmesh;
+         Mesh = LoadWingsObjFile(ModelPath,S->B[j].MeshFileName,
+            &Matl,&Nmatl,Mesh,&Nmesh,&S->B[j].MeshTag,
             AeroShadowsActive || SolPressShadowsActive);
-         if (ContactActive && OldNgeom != Ngeom) LoadOctree(&Geom[Ngeom-1]);
+         if (ContactActive && OldNmesh != Nmesh) LoadOctree(&Mesh[Nmesh-1]);
       }
 
 /* .. Initialize Bounding Box */
-      memcpy(&S->BBox,&Geom[S->B[0].GeomTag].BBox,sizeof(struct BoundingBoxType));
+      memcpy(&S->BBox,&Mesh[S->B[0].MeshTag].BBox,sizeof(struct BoundingBoxType));
       UpdateScBoundingBox(S);
 
       S->EnvTrq.First = 1;
@@ -3004,7 +3004,7 @@ void LoadSun(void)
       W->HasRing = FALSE;
       strcpy(W->Name,"Sun");
       strcpy(W->MapFileName,"NONE");
-      strcpy(W->GeomFileName,"NONE");
+      strcpy(W->MeshFileName,"NONE");
       strcpy(W->ColTexFileName,"NONE");
       strcpy(W->BumpTexFileName,"NONE");
       for(j=0;j<3;j++) {
@@ -3402,10 +3402,9 @@ void LoadMoonsOfMars(void)
          for(i=0;i<4;i++) M->Color[i] = 1.0;
          M->Type = MOON;
       }
-      strcpy(World[PHOBOS].GeomFileName,"Phobos.obj");
-      Geom = LoadWingsObjFile(ModelPath,World[PHOBOS].GeomFileName,
-         &Matl,&Nmatl,Geom,&Ngeom,&World[PHOBOS].GeomTag,FALSE);
-
+      //strcpy(World[PHOBOS].MeshFileName,"Phobos.obj");
+      //Mesh = LoadWingsObjFile(ModelPath,World[PHOBOS].MeshFileName,
+      //   &Matl,&Nmatl,Mesh,&Nmesh,&World[PHOBOS].MeshTag,FALSE);
 
 #undef Nm
 }
@@ -3921,7 +3920,7 @@ void LoadMinorBodies(void)
          fscanf(infile,"%s %[^\n] %[\n]",response,junk,&newline);
          W->Type=DecodeString(response);
          fscanf(infile,"%s %[^\n] %[\n]",W->MapFileName,junk,&newline);
-         fscanf(infile,"%s %[^\n] %[\n]",W->GeomFileName,junk,&newline);
+         fscanf(infile,"%s %[^\n] %[\n]",W->MeshFileName,junk,&newline);
          fscanf(infile,"%s %[^\n] %[\n]",W->ColTexFileName,junk,&newline);
          fscanf(infile,"%s %[^\n] %[\n]",W->BumpTexFileName,junk,&newline);
          fscanf(infile,"%lf %[^\n] %[\n]",&W->mu,junk,&newline);
@@ -3954,9 +3953,9 @@ void LoadMinorBodies(void)
          while ((E->tp-DynTime0) < -E->Period) E->tp += E->Period;
          while ((E->tp-DynTime0) >  E->Period) E->tp -= E->Period;
 
-         Geom = LoadWingsObjFile(ModelPath,W->GeomFileName,
-            &Matl,&Nmatl,Geom,&Ngeom,&W->GeomTag,TRUE);
-         W->Density = W->mu/(6.67408E-11*PolyhedronVolume(&Geom[W->GeomTag]));
+         Mesh = LoadWingsObjFile(ModelPath,W->MeshFileName,
+                                 &Matl,&Nmatl,Mesh,&Nmesh,&W->MeshTag,TRUE);
+         W->Density = W->mu/(6.67408E-11*PolyhedronVolume(&Mesh[W->MeshTag]));
 
          W->Parent = SOL;
          W->Nsat = 0;
@@ -4046,9 +4045,9 @@ void LoadRegions(void)
              R->wn[2] = W->w*sin(R->Lat);
              fscanf(infile,"%lf %lf %lf %[^\n] %[\n]",
                 &R->ElastCoef,&R->DampCoef,&R->FricCoef,junk,&newline);
-             fscanf(infile,"%s %[^\n] %[\n]",R->GeomFileName,junk,&newline);
-             Geom = LoadWingsObjFile(ModelPath,R->GeomFileName,
-                &Matl,&Nmatl,Geom,&Ngeom,&R->GeomTag,TRUE);
+             fscanf(infile,"%s %[^\n] %[\n]",R->MeshFileName,junk,&newline);
+             Mesh = LoadWingsObjFile(ModelPath,R->MeshFileName,
+                &Matl,&Nmatl,Mesh,&Nmesh,&R->MeshTag,TRUE);
           }
           fclose(infile);
       }
@@ -4706,12 +4705,12 @@ void InitSim(int argc, char **argv)
 /* .. Load Materials */
       Nmatl = 0;
       Matl = AddMtlLib(ModelPath,"42.mtl",Matl,&Nmatl);
-      ScaleSpecDiffFrac(Matl,Nmatl);
+       ScaleSpecDiffFrac(Matl,Nmatl);
 
-      /* Known bug: First Geom loaded in gets corrupted.
-      Kludge fix: Load a sacrificial geom first.  */
-      Geom = LoadWingsObjFile(ModelPath,"Point.obj",
-            &Matl,&Nmatl,Geom,&Ngeom,&JunkTag,FALSE);
+      /* Known bug: First Mesh loaded in gets corrupted.
+      Kludge fix: Load a sacrificial mesh first.  */
+      Mesh = LoadWingsObjFile(ModelPath,"Point.obj",
+         &Matl,&Nmatl,Mesh,&Nmesh,&JunkTag,FALSE);
 
 /* .. Time */
       if (TimeMode == EXTERNAL_TIME) {

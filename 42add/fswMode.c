@@ -316,11 +316,11 @@ void ThrLvlhMode(struct SCType *S){
         Cmd->qrl[2] = 0; Cmd->qrl[3] = 0;
         /* Chek sensors and actuators */
         if(AC->Nst == 0 || AC->Ngps==0 || AC->Ngyro<3){
-            printf("EasyLvlhMode: check SC sensors, Nst=%li, Ngps=%li, Ngyro=%li\n",
+            printf("ThrLvlhMode: check SC sensors, Nst=%li, Ngps=%li, Ngyro=%li\n",
                    AC->Nst, AC->Ngps, AC->Ngyro);
         }
         if(AC->Nmtb > 0 && AC->Nmtb != 3){
-            printf("EasyLvlhMode: check MTBs, Nmtb=%li\n", AC->Nmtb);
+            printf("ThrLvlhMode: check MTBs, Nmtb=%li\n", AC->Nmtb);
         }
 
     }

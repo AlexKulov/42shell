@@ -1,100 +1,101 @@
-# 42shell - это дополнение к 42 для быстрого старта, разработки и тестирования бортовых алгоритмов управления
+#42shell - An Extension to 42 for Rapid Startup, Development, and Testing of Onboard Control Algorithms
 
-42shell основан на оригинальном проекте 42, который является его подмодулем.
-Важными преимуществами проекта 42 являются 
-1) написан на единственном "базовом" языке программирования С и
-2) обладает значительными возможностями моделирования: орбитального и углового движения, 
-межпланетных перелётов и нескольких аппаратов одновременно 
-Более подробно https://github.com/ericstoneking/42
+42shell is based on the original 42 project, which is included as a submodule.  
+Key advantages of the 42 project are:  
+1) It is written in a single "foundational" programming language, C.  
+2) It offers extensive simulation capabilities: orbital and attitude dynamics,  
+interplanetary transfers, and simultaneous multi‑spacecraft operations.  
+For more details, visit: https://github.com/ericstoneking/42
 
-## Структура репозитория
+## Structure of repo
 ```
 -- 42shell
-    |-- 42
-    |   |-- Contains a origin 42 repo
+    |-- 42core
+    |   |-- Contains a lightweight fork 42 repo
     |-- 42change
     |   |-- Contains a change 42 code files like 42 strucure
     |-- 42support
     |   |-- Contains freeglut and glew library
     |   |-- Contains code files (QtSource) only Qt lib (Qt5 m.b. more)
-    |   |-- Contains qt project file for build from ../42 folder
+    |   |-- Contains Qmake (with qplot) and Cmake files for build 42
     |-- shInOut
-    |   |-- Like 42/InOut, but demo example for 42shell repo
+    |   |-- Like 42/InOut or 42/Demo, but demo example for 42shell repo
     |-- 42add
-    |   |-- Specific programm models for shell42, but not work without orig 42
+    |   |-- Specific programm models for 42shell (not work without 42)
 	|-- img
     |   |-- just picture for readme
 ```
 
-## Предпосылки
+## Prerequisites  
+  
+1) Download repo to your computer with submodule 42core  
 
-1) загрузите этот репозиторий на свой компьютер с подмодулем 42
-    
-а) через командную строку (предполагает установку git):    
-git clone --recursive https://github.com/AlexKulov/42shell.git   
-   
-б) через сайт. Скачайте архив репозитория   
-![Рисунок 1](img/DownLoadRepo.png)   
-распакуйте полученный архив в нужную директорию. При этом папка 42 будет пустая.   
-Чтобы скачать содержимое папки 42, перейдите в Проект 42 по ссылке   
-![Рисунок 3](img/DownLoadRepo2.png)   
-И также скачайте его (обратите внимание, что [хэш коммита совпадает](img/DownLoadRepo3.png))   
-Вам осталось распаковать полученный архив 42 в соотвествтующую папку [42](img/DownLoadRepo1.png)
-   
-2) установите на компьютер Qt (я использовал Qt5.12).    
-**Only OS Windows**: При установке Qt5 (м.б. Qt6) обязательно добавьте компилятор 
-MinGW 32(64)-bit   
-**Only OS Linux(Ubuntu 18)**: Установите Qt   
+a) via the command line (requires git installation):  
+git clone --recursive https://github.com/AlexKulov/42shell.git  
+  
+b) via the website. Download the repo archive
+![Figure 1](img/DownLoadRepo.png)  
+unzip archive to the desired directory. Folder 42core will be empty.  
+  
+To download the contents of folder 42core, follow the submodule link
+![Figure 3](img/DownLoadRepo2.png)  
+Download it as well (note that the [commit hash matches](img/DownLoadRepo3.png))  
+Now you just need to unzip the resulting archive 42core to the appropriate folder [42core](img/DownLoadRepo1.png)  
+  
+2) Install Qt on your computer (I used Qt5.12).  
+**Windows OS Only**: When installing Qt5 (maybe Qt6),  
+be sure to add the compiler MinGW 32(64)-bit  
+**Linux OS Only (Ubuntu 18)**: Install Qt  
+  
+## Quick Start for Windows/Linux  
+  
+**Windows OS Only!!!**: Copy the DLL files from the 42support/glew and 42support/freeglut folders to the 42 folder  
+(to run the .exe file compiled in this folder)  
+**Windows/Linux (Ubuntu 18)**:  
+1) Open the 42support/42.pro file in Qt Creator, select the MinGW 32-bit compiler  
+(this is important, as the DLL files are compiled with this in mind) and click "More Details." Next, select the 42support directory  
+for all three cases and click "Configure Project."  
+** Important! The path to 42support should not contain Cyrillic characters. **  
+![Figure 4](img/ConfigProject.jpg)  
+2) Run the project (green triangle with a bug in the lower left)  
+3) Click the "Start" button on the widget that appears  
+  
+3D graphics (42) should appear, and graphs (Qt) should also begin rendering.  
+**Linux OS Only (Ubuntu 18)**: likely works on other Linux distributions as well.  
+  
+## 42InOut Test Cases...
 
-## Быстрый старт для OS Windows/Linux
+First of all, to work with 42, you need input data (ID) files.  
+When 42 starts, it looks for ID files in the ./InOut folder by default.  
+During a quick start, this was exactly how it was: the ID files were located in the 42/InOut folder  
+(or simply ./InOut, since the executable file is located in the 42 folder).  
+For the 42shell project, I developed several new test cases.  
+Here are some of them (located in the shInOut folder):  
+- **42InOut4Mode**: Enables 4 test modes: 3 single-axis (Sun, nadir, and target on Earth)  
+and 1 three-axis - orientation in LVLH (in Russian terminology, this is similar to  
+orbital coordinate system). The mode switching logic is written in the Inp_Cmd.txt file:  
 
-**Only OS Windows!!!**: скопируйте dll файлы из папок 42support/glew и 42support/freeglut в папку 42 
-(чтобы запускать exe-файл, который компилируется в этой папке)   
-**OS Windows/Linux(Ubuntu 18)**:   
-1) откройте файл 42support/42.pro через Qt Creator, выбирете компилятор MinGW 32-bit 
-(это важно, т.к. файлы dll собраны с учётом этого) и нажмите "Подробнее". Далее выбирете директорию 
-42support для всех трёх случаев и нажмите конопку "Настроить проект"
-** Важно! В пути к 42support не должно быть кириллицы **
-![Рисунок 4](img/ConfigProject.jpg) 
-2) запустите проект на выполнение (слева внизу зелёный треугольник с жуком)
-3) на появившемся виджете нажмите кнопку "Старт"
-
-В итоге должна появится 3D графика (42), а также должны начать отрисовываться графики(Qt)   
-**Only OS Linux(Ubuntu 18)**: скорее всего работает и на других дистрибутивах Linux
-   
-## Тестовые примеры 42InOut...
-
-Прежде всего, чтобы работать с 42 нужны файлы исходных данных(ИД). 
-Когда запускается 42 по умолчанию он ищет файлы ИД в папке ./InOut.
-При быстром старте было именно так, файлы ИД находились в папке 42/InOut
-(или просто ./InOut, т.к. исполняемый файл лежит в папке 42).
-Для проекта 42shell я разработал несколько новых тестовых примеров.
-Вот некотрые из них (находятся в папке shInOut)   
-- **42InOut4Mode**: Включает 4 тестовых режима: 3 одноосных (Солнце, надир и цель на Земле)
- и 1 трёхосный - ориентация в LVLH (в русскоязычной терминологии это похоже на 
- орбитальную СК). Логика переключения режимов записана в файле Inp_Cmd.txt:
- сначала КА ориентируется на Солнце осью b3, после входа в тень и потери Солнца ось b3 
-переориентируется в надир (это происходит примерно над Атлантикой), при выходе из тени в полутень 
-дополняется ориентация осей b1 и b2: b1 по направлению полёта, b2 перпендикулярна плоскости орбиты 
-(это LVLH ориентация), затем пролетая над Австралией, КА нацеливает b3 на город Джаяпура 
-(Индонезия) с координатами 140.71 градусов в.д. и 2.5 ю.ш. (жёстко прописаны в коде);  
-- **42InOutSimplest**: минимально возможный набор файлов ИД: файл аппарата, файл орбиты, файл 
-симуляции и файл команд.
-
-### Как выбрать папку с ИД?
-**Из консоли**: Если вы делаете это из консоли, просто введите первым параметром адрес новой папки ИД. 
-Например, ../42InOutSimplest.
-
-**Из Qt**:
-1) открыть вкладку Проекты (слева иконка зелёного ключа)
-2) в разделе "Сборка и запуск" выбрать "Запустить" (также в левой части окна)
-3) Найти строку для ввода с названием "Параметры командной строки"
-4) в командной строке ввести ../42InOut4Mode
-
-![Рисунок 5](img/QtInOutChoice.png)
-
-
-Теперь можно запускать программу (опять зелёная кнопка с жуком) и нажать кнопку "Старт".
-
-###Благодарность 
-Часть функций add42 (например, в файле fswMode.c) были создан (2024-2025) при поддержке гранта РНФ (Российский научный фонд) №24-29-00706
+The spacecraft first aligns its b3 axis with the Sun. After entering the umbra and losing the Sun, the b3 axis  
+reorients to the nadir (this occurs approximately over the Atlantic). Upon exiting the umbra into the penumbra,  
+the orientation of the b1 and b2 axes is adjusted: b1 is aligned with the flight direction, b2 is perpendicular to the orbital plane  
+(this is the LVLH orientation). Then, while flying over Australia, the spacecraft aims b3 at the city of Jayapura  
+(Indonesia) with coordinates of 140.71 degrees E and 2.5 degrees S (hardcoded);  
+- **42InOutSimplest**: the minimum possible set of ID files: spacecraft file, orbit file, simulation file, and command file.  
+  
+### How do I select the ID folder?  
+**From the console**: If you're doing this from the console, simply enter the address of the new ID folder as the first parameter.  
+  
+For example, ../42InOutSimplest.  
+  
+**From Qt**:  
+1) Open the Projects tab (green key icon on the left)  
+2) In the "Build and Run" section, select "Run" (also on the left side of the window)  
+3) Find the input line labeled "Command Line Parameters"  
+4) Enter ../42InOut4Mode in the command line  
+  
+![Figure 5](img/QtInOutChoice.png)
+  
+Now you can run the program (again, the green button with the bug) and click "Start."  
+  
+### Acknowledgments  
+Some of the add42 functions (for example, in the fswMode.c file) were created (2024-2025) with the support of the Russian Science Foundation (RSF) grant No. 24-29-00706.  

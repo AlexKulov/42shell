@@ -194,44 +194,44 @@ long AdvanceTime(void)
 void UpdateScBoundingBox(struct SCType *S)
 {
 #define REFPT_CM 0
-      struct BodyType *B, *B0;
-      struct BoundingBoxType *BBox;
-      struct GeomType *G;
-      double ctrB[3],ctrN[3],ctrB0[3],maxB0,minB0,r[3];
-      long Ib,i;
+    struct BodyType *B, *B0;
+    struct BoundingBoxType *BBox;
+    struct MeshType *M;
+    double ctrB[3],ctrN[3],ctrB0[3],maxB0,minB0,r[3];
+    long Ib,i;
 
-      B0 = &S->B[0];
-      BBox = &S->BBox;
+    B0 = &S->B[0];
+    BBox = &S->BBox;
 
-      for(Ib=0;Ib<S->Nb;Ib++) {
-         B = &S->B[Ib];
-         G = &Geom[B->GeomTag];
-         for(i=0;i<3;i++) {
-            ctrB[i] = G->BBox.center[i];
+    for(Ib=0;Ib<S->Nb;Ib++) {
+        B = &S->B[Ib];
+        M = &Mesh[B->MeshTag];
+        for(i=0;i<3;i++) {
+            ctrB[i] = M->BBox.center[i];
             if (S->RefPt == REFPT_CM) {
-               ctrB[i] -= B->cm[i];
+                ctrB[i] -= B->cm[i];
             }
-         }
-         MTxV(B->CN,ctrB,ctrN);
-         for(i=0;i<3;i++) {
+        }
+        MTxV(B->CN,ctrB,ctrN);
+        for(i=0;i<3;i++) {
             ctrN[i] += (B->pn[i]-B0->pn[i]);
-         }
-         MxV(B0->CN,ctrN,ctrB0);
-         for(i=0;i<3;i++) {
+        }
+        MxV(B0->CN,ctrN,ctrB0);
+        for(i=0;i<3;i++) {
             if (S->RefPt == REFPT_CM) {
-               ctrB0[i] += B0->cm[i];
+                ctrB0[i] += B0->cm[i];
             }
-            maxB0 = ctrB0[i] + G->BBox.radius;
-            minB0 = ctrB0[i] - G->BBox.radius;
+            maxB0 = ctrB0[i] + M->BBox.radius;
+            minB0 = ctrB0[i] - M->BBox.radius;
             if(BBox->max[i] < maxB0) BBox->max[i] = maxB0;
             if(BBox->min[i] > minB0) BBox->min[i] = minB0;
-         }
-      }
-      for(i=0;i<3;i++) {
-         BBox->center[i] = 0.5*(BBox->max[i]+BBox->min[i]);
-         r[i] = BBox->max[i]-BBox->center[i];
-      }
-      BBox->radius = MAGV(r);
+        }
+    }
+    for(i=0;i<3;i++) {
+        BBox->center[i] = 0.5*(BBox->max[i]+BBox->min[i]);
+        r[i] = BBox->max[i]-BBox->center[i];
+    }
+    BBox->radius = MAGV(r);
 #undef REFPT_CM
 }
 /**********************************************************************/
