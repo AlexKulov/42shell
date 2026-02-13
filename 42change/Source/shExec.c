@@ -481,8 +481,13 @@ int exec(int argc,char **argv)
       }
 
       #ifdef _ENABLE_GUI_
+      static long imGuiPlotEnable = 1;
          if (GLEnable) {
             HandoffToGui(argc,argv);
+         }
+         else if (imGuiPlotEnable) {
+             extern int HandoffToPlotGui(int argc, char **argv);
+             HandoffToPlotGui(argc,argv);
          }
          else {
             while(!Done) {

@@ -27,6 +27,29 @@ else {
     ../42/Source/42main.c \
 }
 
+CONFIG += IMPLOT
+IMPLOT {
+    DEFINES += _USE_IMPLOT_
+    INCLUDEPATH +=../42add/plot \
+                  ../42add/plot/imgui \
+                  ../42add/plot/imgui/backends \
+                  ../42add/plot/implot
+    SOURCES += \
+        ../42add/plot/plotDraw.cpp
+
+    SOURCES += \
+        ../42add/plot/imgui/imgui.cpp \
+        ../42add/plot/imgui/imgui_draw.cpp \
+        ../42add/plot/imgui/imgui_widgets.cpp \
+        ../42add/plot/imgui/imgui_tables.cpp \
+        ../42add/plot/imgui/backends/imgui_impl_glut.cpp \
+        ../42add/plot/imgui/backends/imgui_impl_opengl2.cpp
+
+    SOURCES += \
+        ../42add/plot/implot/implot.cpp \
+        ../42add/plot/implot/implot_items.cpp \
+}
+
 CONFIG += 42GUI
 42GUI {
     DEFINES += _ENABLE_GUI_
@@ -36,8 +59,8 @@ CONFIG += 42GUI
                    freeglut/include/GL
 
     SOURCES += \
-        ../42/Kit/Source/glkit.c \
-        ../42/Source/42gl.c \
+        ../42core/Kit/Source/glkit.c \
+        ../42core/Source/42gl.c \
         ../42change/Source/42glut.c \
         ../42change/Source/42gpgpu.c
     # GLWF not use in origin 42/Makefile
@@ -55,36 +78,35 @@ CONFIG += 42GUI
     }
 }
 
-INCLUDEPATH +=../42/Include \
-              ../42/Kit/Include \
+INCLUDEPATH +=../42core/Include \
+              ../42core/Kit/Include \
               ../42add
 
 SOURCES += \
-        ../42/Kit/Source/dcmkit.c \
-        ../42/Kit/Source/envkit.c \
-        ../42/Kit/Source/fswkit.c \
+        ../42core/Kit/Source/dcmkit.c \
+        ../42core/Kit/Source/envkit.c \
+        ../42core/Kit/Source/fswkit.c \
         #../42/Kit/Source/geomkit.c \
-        ../42/Kit/Source/meshkit.c \
-        ../42/Kit/Source/iokit.c \
-        ../42/Kit/Source/mathkit.c \
-        ../42/Kit/Source/msis86kit.c \
-        ../42/Kit/Source/nrlmsise00kit.c \
-        ../42/Kit/Source/orbkit.c \
-        ../42/Kit/Source/sigkit.c \
-        ../42/Kit/Source/sphkit.c \
-        ../42/Kit/Source/timekit.c \
-        ../42/Source/42actuators.c \
-        ../42/Source/42environs.c \
-        ../42/Source/42ephem.c \
-        ../42/Source/42ipc.c \
-        ../42/Source/42perturb.c \
-        ../42/Source/42sensors.c \
-        ../42/Source/42jitter.c \
-        ../42/Source/42joints.c \
-        ../42/Source/42optics.c \
-        ../42/Source/AcApp.c \
-        ../42/Source/42dynamics.c \
-        #../42/Source/42init.c \
+        ../42core/Kit/Source/meshkit.c \
+        ../42core/Kit/Source/iokit.c \
+        ../42core/Kit/Source/mathkit.c \
+        ../42core/Kit/Source/msis86kit.c \
+        ../42core/Kit/Source/nrlmsise00kit.c \
+        ../42core/Kit/Source/orbkit.c \
+        ../42core/Kit/Source/sigkit.c \
+        ../42core/Kit/Source/sphkit.c \
+        ../42core/Kit/Source/timekit.c \
+        ../42core/Source/42actuators.c \
+        ../42core/Source/42environs.c \
+        ../42core/Source/42ephem.c \
+        ../42core/Source/42ipc.c \
+        ../42core/Source/42perturb.c \
+        ../42core/Source/42sensors.c \
+        ../42core/Source/42jitter.c \
+        ../42core/Source/42joints.c \
+        ../42core/Source/42optics.c \
+        ../42core/Source/AcApp.c \
+        ../42core/Source/42dynamics.c \
         ../42/Source/42fsw.c \
         ../42/Source/42cmd.c \
     ../42add/PSModel.c \
@@ -102,22 +124,22 @@ SOURCES += \
 CONFIG += IPC_OVERHAUL
 IPC_OVERHAUL {
     SOURCES += \
-        ../42/Source/AutoCode/TxRxIPC.c \
-        ../42/Source/AutoCode/WriteAcToCsv.c \
-        ../42/Source/AutoCode/WriteScToCsv.c
+        ../42core/Source/AutoCode/TxRxIPC.c \
+        ../42core/Source/AutoCode/WriteAcToCsv.c \
+        ../42core/Source/AutoCode/WriteScToCsv.c
 }
 else{
    SOURCES += \
-        ../42/Source/IPC/SimReadFromFile.c \
-        ../42/Source/IPC/SimReadFromSocket.c \
-        ../42/Source/IPC/SimWriteToFile.c \
-        ../42/Source/IPC/SimWriteToSocket.c
+        ../42core/Source/IPC/SimReadFromFile.c \
+        ../42core/Source/IPC/SimReadFromSocket.c \
+        ../42core/Source/IPC/SimWriteToFile.c \
+        ../42core/Source/IPC/SimWriteToSocket.c
 }
 
 TEMPLATE = app
 TARGET = 42
 
 OBJECTS_DIR = ./debug
-DESTDIR = ./../42
+DESTDIR = ./../42core
 
 win32: LIBS += -lws2_32
