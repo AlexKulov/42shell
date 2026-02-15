@@ -6,53 +6,56 @@ project(42twin LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_C_STANDARD 99)
 # Path for exec file generation
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../../42)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../../42core)
 
 # Include path for headers
 include_directories(
-    ../42/Include
-    ../42change/Include
-    ../42/Kit/Include
+    ../42core/Include
+    ../42core/Kit/Include
+    ../42dev
 )
 
 # Src file list
 set(SOURCES
-    ../42/Source/42main.c
-    ../42/Kit/Source/dcmkit.c
-    ../42/Kit/Source/envkit.c
-    ../42/Kit/Source/fswkit.c
-    ../42/Kit/Source/geomkit.c
-    ../42/Kit/Source/iokit.c
-    ../42/Kit/Source/mathkit.c
-    ../42/Kit/Source/msis86kit.c
-    ../42/Kit/Source/nrlmsise00kit.c
-    ../42/Kit/Source/orbkit.c
-    ../42/Kit/Source/sigkit.c
-    ../42/Kit/Source/sphkit.c
-    ../42/Kit/Source/timekit.c
-    ../42/Source/42actuators.c
-    ../42/Source/42environs.c
-    ../42/Source/42ephem.c
-    ../42/Source/42ipc.c
-    ../42/Source/42perturb.c
-    ../42/Source/42sensors.c
-    ../42/Source/42jitter.c
-    ../42/Source/42joints.c
-    ../42/Source/42optics.c
-    ../42/Source/AcApp.c
-    ../42/Source/42dynamics.c
-    ../42/Source/42fsw.c
-    ../42/Source/42cmd.c
+    ../42core/Source/42main.c
+    ../42core/Kit/Source/dcmkit.c
+    ../42core/Kit/Source/envkit.c
+    ../42core/Kit/Source/fswkit.c
+    ../42core/Kit/Source/meshkit.c
+    ../42core/Kit/Source/iokit.c
+    ../42core/Kit/Source/mathkit.c
+    ../42core/Kit/Source/msis86kit.c
+    ../42core/Kit/Source/nrlmsise00kit.c
+    ../42core/Kit/Source/orbkit.c
+    ../42core/Kit/Source/sigkit.c
+    ../42core/Kit/Source/sphkit.c
+    ../42core/Kit/Source/timekit.c
+    ../42core/Source/42actuators.c
+    ../42core/Source/42environs.c
+    ../42core/Source/42ephem.c
+    ../42core/Source/42ipc.c
+    ../42core/Source/42perturb.c
+    ../42core/Source/42sensors.c
+    ../42core/Source/42jitter.c
+    ../42core/Source/42joints.c
+    ../42core/Source/42optics.c
+    ../42core/Source/AcApp.c
+    ../42core/Source/42dynamics.c
+    ../42core/Source/42fsw.c
+    ../42core/Source/42cmd.c
+    ../42core/Source/AutoCode/TxRxIPC.c
+    ../42core/Source/AutoCode/WriteAcToCsv.c
+    ../42core/Source/AutoCode/WriteScToCsv.c
+    ../42dev/PSModel.c
+    ../42dev/SPSModel.c
+    ../42dev/fswAlg.c
+    ../42dev/fswMode.c
+    ../42dev/orbControl.c
     ../42change/Source/42init.c
-    ../42change/Source/shIokit.c
-    ../42change/Source/42exec.c
+    ../42change/Source/shActuators.c
     ../42change/Source/shFsw.c
-    ../cAlgorithms/serviceAlg.c
-    ../cAlgorithms/simplestMode.c
-#IPC_OVERHAUL - 42 version after 27.03.25
-    ../42/Source/AutoCode/TxRxIPC.c
-    ../42/Source/AutoCode/WriteAcToCsv.c
-    ../42/Source/AutoCode/WriteScToCsv.c
+    ../42change/Source/shIokit.c
+    ../42change/Source/shExec.c
 )
 
 # Exec file create
@@ -63,4 +66,4 @@ if(WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE ws2_32)
 endif()
 
-target_link_libraries(${PROJECT_NAME} m)
+#target_link_libraries(${PROJECT_NAME} m)

@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-void   InitPSModel(struct SCType *S);
+void   initPSModel(struct SCType *S);
 long        PSModel(struct SCType *S);
 double getThrsFuel(struct SCType *S, long i);
 

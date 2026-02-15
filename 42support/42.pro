@@ -3,51 +3,51 @@ QT -= gui
 CONFIG += console
 CONFIG -= app_bundle
 
-CONFIG -= QTPLOT
+CONFIG += QTPLOT
 QTPLOT {
     DEFINES += _USE_QTPLOT_
     QT += core gui widgets
     QT += network printsupport #for customplot
-    INCLUDEPATH +=QtSource \
+    INCLUDEPATH +=../42dev/qtPlotGui
 
     SOURCES += \
-    QtSource/mainwindow.cpp \
-    QtSource/main.cpp \
-    QtSource/qcustomplot.cpp \
+    ../42dev/qtPlotGui/mainwindow.cpp \
+    ../42dev/qtPlotGui/main.cpp \
+    ../42dev/qtPlotGui/qcustomplot.cpp
 
     HEADERS += \
-    QtSource/mainwindow.h \
-    QtSource/qcustomplot.h
+    ../42dev/qtPlotGui/mainwindow.h \
+    ../42dev/qtPlotGui/qcustomplot.h
 
     FORMS += \
-    QtSource/mainwindow.ui
+    ../42dev/qtPlotGui/mainwindow.ui
 }
 else {
     SOURCES += \
-    ../42/Source/42main.c \
+    ../42core/Source/42main.c
 }
 
 CONFIG += IMPLOT
 IMPLOT {
     DEFINES += _USE_IMPLOT_
-    INCLUDEPATH +=../42add/plot \
-                  ../42add/plot/imgui \
-                  ../42add/plot/imgui/backends \
-                  ../42add/plot/implot
+    INCLUDEPATH +=../42dev/imPlotGui \
+                  ../42dev/imPlotGui/imgui \
+                  ../42dev/imPlotGui/imgui/backends \
+                  ../42dev/imPlotGui/implot
     SOURCES += \
-        ../42add/plot/plotDraw.cpp
+        ../42dev/imPlotGui/plotDraw.cpp
 
     SOURCES += \
-        ../42add/plot/imgui/imgui.cpp \
-        ../42add/plot/imgui/imgui_draw.cpp \
-        ../42add/plot/imgui/imgui_widgets.cpp \
-        ../42add/plot/imgui/imgui_tables.cpp \
-        ../42add/plot/imgui/backends/imgui_impl_glut.cpp \
-        ../42add/plot/imgui/backends/imgui_impl_opengl2.cpp
+        ../42dev/imPlotGui/imgui/imgui.cpp \
+        ../42dev/imPlotGui/imgui/imgui_draw.cpp \
+        ../42dev/imPlotGui/imgui/imgui_widgets.cpp \
+        ../42dev/imPlotGui/imgui/imgui_tables.cpp \
+        ../42dev/imPlotGui/imgui/backends/imgui_impl_glut.cpp \
+        ../42dev/imPlotGui/imgui/backends/imgui_impl_opengl2.cpp
 
     SOURCES += \
-        ../42add/plot/implot/implot.cpp \
-        ../42add/plot/implot/implot_items.cpp \
+        ../42dev/imPlotGui/implot/implot.cpp \
+        ../42dev/imPlotGui/implot/implot_items.cpp \
 }
 
 CONFIG += 42GUI
@@ -80,13 +80,12 @@ CONFIG += 42GUI
 
 INCLUDEPATH +=../42core/Include \
               ../42core/Kit/Include \
-              ../42add
+              ../42dev
 
 SOURCES += \
         ../42core/Kit/Source/dcmkit.c \
         ../42core/Kit/Source/envkit.c \
         ../42core/Kit/Source/fswkit.c \
-        #../42/Kit/Source/geomkit.c \
         ../42core/Kit/Source/meshkit.c \
         ../42core/Kit/Source/iokit.c \
         ../42core/Kit/Source/mathkit.c \
@@ -107,34 +106,21 @@ SOURCES += \
         ../42core/Source/42optics.c \
         ../42core/Source/AcApp.c \
         ../42core/Source/42dynamics.c \
-        ../42/Source/42fsw.c \
-        ../42/Source/42cmd.c \
-    ../42add/PSModel.c \
-    ../42add/SPSModel.c \
-    ../42add/fswAlg.c \
-    ../42add/fswMode.c \
-        ../42change/Source/42init.c \
-    ../42change/Source/shActuators.c \
-        ../42change/Source/shFsw.c \
-        ../42change/Source/shIokit.c \
-    ../42change/Source/shExec.c \
-    ../42add/orbControl.c
-
-#42 version after 27.03.25
-CONFIG += IPC_OVERHAUL
-IPC_OVERHAUL {
-    SOURCES += \
         ../42core/Source/AutoCode/TxRxIPC.c \
         ../42core/Source/AutoCode/WriteAcToCsv.c \
-        ../42core/Source/AutoCode/WriteScToCsv.c
-}
-else{
-   SOURCES += \
-        ../42core/Source/IPC/SimReadFromFile.c \
-        ../42core/Source/IPC/SimReadFromSocket.c \
-        ../42core/Source/IPC/SimWriteToFile.c \
-        ../42core/Source/IPC/SimWriteToSocket.c
-}
+        ../42core/Source/AutoCode/WriteScToCsv.c \
+        ../42core/Source/42fsw.c \
+        ../42core/Source/42cmd.c \
+        ../42dev/PSModel.c \
+        ../42dev/SPSModel.c \
+        ../42dev/fswAlg.c \
+        ../42dev/fswMode.c \
+        ../42dev/orbControl.c \
+        ../42change/Source/42init.c \
+        ../42change/Source/shActuators.c \
+        ../42change/Source/shFsw.c \
+        ../42change/Source/shIokit.c \
+        ../42change/Source/shExec.c
 
 TEMPLATE = app
 TARGET = 42

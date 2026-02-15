@@ -376,14 +376,21 @@ static void DrawPlotWindow(void) {
 
                     if (time_data && wb_x_data && wb_y_data && wb_z_data) {
                         /* Рисуем линии с разными цветами */
-                        ImPlot::SetNextLineStyle(plot_buffers[PLOT_WB_X].color, 2.0f);
-                        ImPlot::PlotLine("w_x", time_data, wb_x_data, count);
+                        ImPlotSpec spec;
+                        spec.LineColor = plot_buffers[PLOT_WB_X].color;
+                        spec.LineWeight = 2.0f;
+                        ImPlot::PlotLine("w_x", time_data, wb_x_data, count, spec);
 
-                        ImPlot::SetNextLineStyle(plot_buffers[PLOT_WB_Y].color, 2.0f);
-                        ImPlot::PlotLine("w_y", time_data, wb_y_data, count);
+                        //ImPlot::SetNextLineStyle(plot_buffers[PLOT_WB_X].color, 2.0f);
+                        //ImPlot::PlotLine("w_x", time_data, wb_x_data, count);
 
-                        ImPlot::SetNextLineStyle(plot_buffers[PLOT_WB_Z].color, 2.0f);
-                        ImPlot::PlotLine("w_z", time_data, wb_z_data, count);
+                        //ImPlot::SetNextLineStyle(plot_buffers[PLOT_WB_Y].color, 2.0f);
+                        spec.LineColor = plot_buffers[PLOT_WB_Y].color;
+                        ImPlot::PlotLine("w_y", time_data, wb_y_data, count, spec);
+
+                        //ImPlot::SetNextLineStyle(plot_buffers[PLOT_WB_Z].color, 2.0f);
+                        spec.LineColor = plot_buffers[PLOT_WB_Z].color;
+                        ImPlot::PlotLine("w_z", time_data, wb_z_data, count, spec);
                     }
 
                     /* Освобождаем временные массивы */
@@ -466,17 +473,24 @@ static void DrawPlotWindow(void) {
 
                     if (time_data && rw1_data && rw2_data && rw3_data && rw4_data) {
                         /* Рисуем линии с разными цветами */
-                        ImPlot::SetNextLineStyle(plot_buffers[PLOT_RW1].color, 1.5f);
-                        ImPlot::PlotLine("RW1", time_data, rw1_data, count);
+                        ImPlotSpec spec;
+                        spec.LineColor = plot_buffers[PLOT_RW1].color;
+                        spec.LineWeight = 2.0f;
 
-                        ImPlot::SetNextLineStyle(plot_buffers[PLOT_RW2].color, 1.5f);
-                        ImPlot::PlotLine("RW2", time_data, rw2_data, count);
+                        //ImPlot::SetNextLineStyle(plot_buffers[PLOT_RW1].color, 1.5f);
+                        ImPlot::PlotLine("RW1", time_data, rw1_data, count, spec);
 
-                        ImPlot::SetNextLineStyle(plot_buffers[PLOT_RW3].color, 1.5f);
-                        ImPlot::PlotLine("RW3", time_data, rw3_data, count);
+                        //ImPlot::SetNextLineStyle(plot_buffers[PLOT_RW2].color, 1.5f);
+                        spec.LineColor = plot_buffers[PLOT_RW2].color;
+                        ImPlot::PlotLine("RW2", time_data, rw2_data, count, spec);
 
-                        ImPlot::SetNextLineStyle(plot_buffers[PLOT_RW4].color, 1.5f);
-                        ImPlot::PlotLine("RW4", time_data, rw4_data, count);
+                        //ImPlot::SetNextLineStyle(plot_buffers[PLOT_RW3].color, 1.5f);
+                        spec.LineColor = plot_buffers[PLOT_RW3].color;
+                        ImPlot::PlotLine("RW3", time_data, rw3_data, count, spec);
+
+                        //ImPlot::SetNextLineStyle(plot_buffers[PLOT_RW4].color, 1.5f);
+                        spec.LineColor = plot_buffers[PLOT_RW4].color;
+                        ImPlot::PlotLine("RW4", time_data, rw4_data, count, spec);
                     }
 
                     /* Освобождаем временные массивы */

@@ -66,7 +66,7 @@ extern "C"{
 #include "42.h"
 #include "SPSModel.h"
 #include "PSModel.h"
-#include "../42add/serviceAlg.h"
+#include "../42dev/serviceAlg.h"
 extern int exec(int argc,char **argv);
 
 void ToPlot(double Time);

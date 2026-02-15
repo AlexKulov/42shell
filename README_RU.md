@@ -10,18 +10,18 @@
 ## Структура репозитория
 ```
 -- 42shell
+    |-- 42dev
+    |   |-- New programm module for 42 environment: models, fsw and other kit algs
+    |-- 42change
+    |   |-- Contains a modify 42 code files
     |-- 42core
     |   |-- Contains a lightweight fork 42 repo
-    |-- 42change
-    |   |-- Contains a change 42 code files like 42 strucure
     |-- 42support
     |   |-- Contains freeglut and glew library
     |   |-- Contains code files (QtSource) only Qt lib (Qt5 m.b. more)
     |   |-- Contains Qmake (with qplot) and Cmake files for build 42
     |-- shInOut
     |   |-- Like 42/InOut or 42/Demo, but demo example for 42shell repo
-    |-- 42add
-    |   |-- Specific programm models for 42shell (not work without 42)
 	|-- img
     |   |-- just picture for readme
 ```

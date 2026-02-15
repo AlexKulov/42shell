@@ -1,6 +1,9 @@
-[submodule "42"]
-	path = 42core
-	url = https://github.com/AlexKulov/42core
 [submodule "42core"]
 	path = 42core
 	url = https://github.com/AlexKulov/42core.git
+[submodule "42dev/imPlotGui/implot"]
+	path = 42dev/imPlotGui/implot
+	url = https://github.com/epezent/implot.git
+[submodule "42dev/imPlotGui/imgui"]
+	path = 42dev/imPlotGui/imgui
+	url = https://github.com/ocornut/imgui.git
