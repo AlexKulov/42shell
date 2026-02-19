@@ -215,5 +215,8 @@ long PSModel(struct SCType *S){
         }
         return 1;
     }//if(prop)
+    else if(S->Nthr){
+        return 1;
+    }
     return 0;
 }

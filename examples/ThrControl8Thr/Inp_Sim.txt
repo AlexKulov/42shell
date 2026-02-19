@@ -1,19 +1,17 @@
 <<<<<<<<<<<<<<<<<  42: The Mostly Harmless Simulator  >>>>>>>>>>>>>>>>>
 ************************** Simulation Control **************************
 FAST                            !  Time Mode (FAST, REAL, EXTERNAL, or NOS3)
-42000.0     0.25                 !  Sim Duration, Step Size [sec]
+440     0.01                  !  Sim Duration, Step Size [sec]
 10.0                            !  File Output Interval [sec]
 0                               !  RNG Seed
-FALSE                            !  Graphics Front End?
+TRUE                            !  Graphics Front End?
 Inp_Cmd.txt                     !  Command Script File Name
 **************************  Reference Orbits  **************************
-2                               !  Number of Reference Orbits
-TRUE   Orb_OO.txt              !  Input file name for Orb 0
-TRUE   Orb_KA.txt              !  Input file name for Orb 1
+1                               !  Number of Reference Orbits
+TRUE   Orb_ThrSC.txt              !  Input file name for Orb 0
 *****************************  Spacecraft  *****************************
-2                               !  Number of Spacecraft
-TRUE 0 SC_OO.txt            !  Existence, RefOrb, Input file for SC 0
-TRUE 1 SC_KA.txt            !  Existence, RefOrb, Input file for SC 1
+1                               !  Number of Spacecraft
+TRUE 0 ThrSC.txt            !  Existence, RefOrb, Input file for SC 0
 ***************************** Environment  *****************************
 04 08 2024                      !  Date (UTC) (Month, Day, Year)
 00 00 0.00                      !  Time (UTC) (Hr,Min,Sec)
@@ -27,7 +25,7 @@ IGRF                            !  Magfield (NONE,DIPOLE,IGRF)
 2   0                           !  Mars Gravity Model N and M (<=18)
 2   0                           !  Luna Gravity Model N and M (<=18)
 FALSE   FALSE                   !  Aerodynamic Forces & Torques (Shadows)
-FALSE                           !  Gravity Gradient Torques
+TRUE                           !  Gravity Gradient Torques
 FALSE   FALSE                   !  Solar Pressure Forces & Torques (Shadows)
 FALSE                           !  Residual Magnetic Moment Torques
 FALSE                           !  Gravity Perturbation Forces

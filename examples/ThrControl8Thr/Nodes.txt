@@ -1,0 +1,13 @@
+<<<<<<<<<<<<<<<<  Body Node Inputs for 42  >>>>>>>>>>>>>>>>>>>>>
+Nodes for ThrDemo               ! Description
+8                               ! Number of Nodes
+******************* Node Location, Comment *********************
+  0.1   -0.15    0.1         "Thr Pod 0"
+  0.1   -0.15   -0.1         "Thr Pod 1"
+ -0.1   -0.15    0.1         "Thr Pod 2"
+ -0.1   -0.15   -0.1         "Thr Pod 3"
+  0.05  -0.15    0.051       "Thr Pod 4"
+  0.05  -0.15   -0.049       "Thr Pod 5"
+ -0.05  -0.15    0.051       "Thr Pod 6"
+ -0.05  -0.15   -0.049       "Thr Pod 7"
+

@@ -12,10 +12,10 @@
 #define DEG2RAD (PI/180.0)
 #define RAD2DEG (180.0/PI)
 #define MAX_DV 10.0     // максимальный импульс, м/с
-#define MAX_ORBITS 25   // максимальное число витков
+#define MAX_ORBITS 50   // максимальное число витков
 
 typedef enum {
-    MINUS_V = 155,
+    MINUS_V = 300,
     PLUS_V
 }IMP_DIRECT;
 
@@ -25,6 +25,8 @@ typedef struct ManeuverImpulse{
     double tStart;   // время выдачи (модельное), с
     bool completed;         // выполнен ли импульс
     bool isExecuted;        // выполняется в данный момент
+    bool isWaitingPhase;    // Флаг ожидания оптимальной фазы
+    double waitStartTime;   // Время начала ожидания
     IMP_DIRECT direct;
 } ManeuverImpulse;
 
@@ -41,6 +43,14 @@ static double addPerigeeVel(OrbitType * chaserOrb, double reqPeriod){
     double reqV = sqrt(2 * mu/chaserOrb->rmin - mu/reqA);
     double curV = sqrt(2 * mu/chaserOrb->rmin - mu/chaserOrb->SMA);
     return reqV-curV;
+}
+
+static double calculateOptimalPhaseAngle(OrbitType *chaserOrb, OrbitType *targetOrb) {
+    // Расчет оптимального фазового угла для начала сближения
+    // Для вашего случая (600км -> 400км) оптимально начинать когда
+    // пассивный отстает на 180-270 градусов
+    double phaseDiff = fabs(chaserOrb->anom - targetOrb->anom);
+    return (phaseDiff > 180.0 * DEG2RAD) ? (360.0 * DEG2RAD - phaseDiff) : phaseDiff;
 }
 
 //dt - время через которое O достигнет перигея A
@@ -94,11 +104,44 @@ ManeuverImpulse impulsPlaninig(OrbitType * chaserOrb, OrbitType * targetOrb){
     double circularV = sqrt(mu / r1);
     double perigeeV = sqrt(2 * mu / r1 - mu / aTransfer);
     double dVp = (perigeeV - circularV); // м/с
-    // 2. ------------------- ИМПУЛЬСЫ В АПОГЕЕ И ПЕРИГЕЕ, 2 ТИПА ------------
+
+    // 2. ------------------- ПРОВЕРКА ФАЗЫ ТОЛЬКО ДЛЯ ПЕРВОГО ИМПУЛЬСА ------------
+    static long firstImpulseDone = 0;
+
+    if (!firstImpulseDone) {
+        double currentPhase = calculateOptimalPhaseAngle(chaserOrb, targetOrb);
+        double optimalPhaseMin = 0.5 * DEG2RAD;
+        double optimalPhaseMax = 14.25 * DEG2RAD;
+
+        if (currentPhase < optimalPhaseMin || currentPhase > optimalPhaseMax) {
+            ManeuverImpulse waitImp = {
+                .dV = 0, .isPlaning = false, .completed = true,
+                .isWaitingPhase = true, .tStart = 0, .direct = MINUS_V
+            };
+            return waitImp;
+        }
+    }
+
+    // 3. ------------------- ИМПУЛЬСЫ В АПОГЕЕ И ПЕРИГЕЕ, 2 ТИПА ------------
     const double dVmin = 5; // м/с
-    ManeuverImpulse
-            aImp = {.dV = dVa, .direct = MINUS_V},
-            pImp = {.dV = dVp, .direct = MINUS_V};
+    ManeuverImpulse aImp = {
+        .dV = dVa,
+        .direct = MINUS_V,
+        .isPlaning = false,
+        .completed = false,
+        .isWaitingPhase = false,
+        .tStart = 0
+    };
+
+    ManeuverImpulse pImp = {
+        .dV = dVp,
+        .direct = MINUS_V,
+        .isPlaning = false,
+        .completed = false,
+        .isWaitingPhase = false,
+        .tStart = 0
+    };
+
     if(aImp.dV>dVmin){
         aImp.dV = dVmin;
         aImp.isPlaning = true;
@@ -111,13 +154,16 @@ ManeuverImpulse impulsPlaninig(OrbitType * chaserOrb, OrbitType * targetOrb){
         pImp.dV = dVmin;
         pImp.isPlaning = true;
     }
+
     double rightNow = SimTime;//это модельное время
     static long phasePlaning = 0;
+
     if((aImp.isPlaning || pImp.isPlaning) && !phasePlaning){
         // 3. ----- ВЫБИРАЕМ ВРЕМЯ СТАРТА, ДЛИТЕЛЬНОСТЬ И ТИП ИМПУЛЬСА ----------
         if(chaserOrb->ecc<0.0008 && aImp.isPlaning){ // значит орбита круговая
             aImp.tStart = rightNow;
             pImp.isPlaning = false;
+            firstImpulseDone = 1;  // ← ОТМЕТИТЬ, ЧТО ПЕРВЫЙ ИМПУЛЬС ВЫПОЛНЕН
             return aImp;
         }
         else{
@@ -156,10 +202,14 @@ ManeuverImpulse impulsPlaninig(OrbitType * chaserOrb, OrbitType * targetOrb){
                     pImp.tStart = aImp.tStart + halfPeriod;
                 }
             }
-            if(aImp.isPlaning)
+            if(aImp.isPlaning) {
+                firstImpulseDone = 1;  // ← ОТМЕТИТЬ, ЧТО ПЕРВЫЙ ИМПУЛЬС ВЫПОЛНЕН
                 return aImp;
-            else
+            }
+            else {
+                firstImpulseDone = 1;  // ← ОТМЕТИТЬ, ЧТО ПЕРВЫЙ ИМПУЛЬС ВЫПОЛНЕН
                 return pImp;
+            }
         }
     }
     else{
@@ -167,7 +217,8 @@ ManeuverImpulse impulsPlaninig(OrbitType * chaserOrb, OrbitType * targetOrb){
         // 4. ---- УСЛОВИЕ, ЕСЛИ МЫ НА ЭЛ. ОРБИТЕ, БЛИЗКОЙ К ЦЕЛЕВОЙ ---------
         // 4.1 Расчёт разницы фаз двух КА: активного и пассивного
         double argLatO = targetOrb->ArgP + targetOrb->anom;
-        double argPerA = chaserOrb->ArgP;
+        //double argLatA = chaserOrb->ArgP + chaserOrb->anom;
+        double argPerA = chaserOrb->ArgP + chaserOrb->anom;
         if(argLatO<0)
             argLatO = 2*PI + argLatO;
         if(argPerA<0)
@@ -190,8 +241,9 @@ ManeuverImpulse impulsPlaninig(OrbitType * chaserOrb, OrbitType * targetOrb){
         if(downP>0)
             downV = addPerigeeVel(chaserOrb, downP);
         double dtP = chaserOrb->tp - DynTime;
-        //4.5 Кол-во витков за которые аппараты сблизятся д.б. меньше 10
-        if(downN<10){
+
+        //4.5 Кол-во витков за которые аппараты сблизятся д.б. меньше 50
+        if(downN<50){
             if(upV<20.0){
                 pImp.dV = upV;
                 pImp.direct = PLUS_V;
@@ -206,17 +258,40 @@ ManeuverImpulse impulsPlaninig(OrbitType * chaserOrb, OrbitType * targetOrb){
         }//иначе просто летаем без импульса и ждём
         else
             pImp.completed = true;
+
         return pImp;
     }
 }
 
-void thrControl(struct SCType *S){
+void thrControl(struct SCType *S)
+{
+    // Все объявления переменных в начале функции
     static struct OrbitType chaserOrb = {0};
     static struct OrbitType targetOrb = {0};
     static struct SCType *chaser;
     static struct SCType *target;
     static ManeuverImpulse actualMI = {0};
     static long isInit = false;
+
+    // Потом логика проверки ожидания
+    if (actualMI.isWaitingPhase) {
+        updateKepler(&chaserOrb, chaser);  // ОБНОВИТЬ орбитальные элементы!
+        updateKepler(&targetOrb, target);
+        double currentPhase = calculateOptimalPhaseAngle(&chaserOrb, &targetOrb);
+        double optimalPhaseMin = 0.5 * DEG2RAD;
+        double optimalPhaseMax = 14.25 * DEG2RAD;
+
+        // Если достигли оптимальной фазы - начинаем маневр
+        if (currentPhase >= optimalPhaseMin && currentPhase <= optimalPhaseMax) {
+            actualMI.isWaitingPhase = false;
+            actualMI.completed = false;
+        } else {
+            // Продолжаем ждать
+            return;
+        }
+    }
+
+
     if(!isInit){
         long iN=0;
         for(iN=0; iN<Nsc;iN++){

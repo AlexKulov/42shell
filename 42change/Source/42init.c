@@ -250,6 +250,8 @@ long DecodeString(char *s)
       else if (!strcmp(s,"LVLH_FSW")) return LVLH_FSW;
       else if (!strcmp(s,"POINT_FSW")) return POINT_FSW;
       else if (!strcmp(s,"NADIR_FSW")) return NADIR_FSW;
+      else if (!strcmp(s,"RANDEZVOUS_FSW")) return RANDEZVOUS_FSW;
+      else if (!strcmp(s,"THR_LVLH_FSW")) return THR_LVLH_FSW;
 
       else {
          printf("Bogus input %s in DecodeString (42init.c:%d)\n",s,__LINE__);

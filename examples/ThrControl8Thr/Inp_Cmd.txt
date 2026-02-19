@@ -1,10 +1,15 @@
 <<<<<<<<<<<<<<<<<  42:  Command Script File  >>>>>>>>>>>>>>>>>
 0.0 SC[0] qrn = [0.0  0.0  0.0  1.0]
-#0.1 SC[0] FswTag = THR_FSW
-0.1 SC[0] FswTag = LVLH_FSW
-#150.0 SC[0] Cmd Angles = [90 0 0] deg, Seq = 123 wrt L Frame
-20 SC[0].AC.Thr[0].PulseWidthCmd = 0.095
-30 SC[0].AC.Thr[0].PulseWidthCmd = 0
+0.1 SC[0] FswTag = THR_LVLH_FSW
+150.0 SC[0] Cmd Angles = [90 0 0] deg, Seq = 123 wrt L Frame
+200 SC[0].AC.Thr[4].PulseWidthCmd = 10
+200 SC[0].AC.Thr[5].PulseWidthCmd = 10
+200 SC[0].AC.Thr[6].PulseWidthCmd = 10
+200 SC[0].AC.Thr[7].PulseWidthCmd = 10
+210 SC[0].AC.Thr[4].PulseWidthCmd = 0
+210 SC[0].AC.Thr[5].PulseWidthCmd = 0
+210 SC[0].AC.Thr[6].PulseWidthCmd = 0
+210 SC[0].AC.Thr[7].PulseWidthCmd = 0
 
 EOF
 

@@ -12,6 +12,7 @@
 #define POINT_FSW (334)
 #define NADIR_FSW (335)
 #define THR_LVLH_FSW (336)
+#define RANDEZVOUS_FSW (337)
 
 /*42dynamics func*/
 typedef struct SCType SCType;

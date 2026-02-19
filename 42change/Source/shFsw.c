@@ -58,6 +58,10 @@ void shFlightSoftWare(struct SCType *S)
             case LVLH_FSW:
                 EasyLvlhMode(S);
                 break;
+            case RANDEZVOUS_FSW:
+                EasyLvlhMode(S);
+                thrControl(S);
+                break;
             case POINT_FSW:
                 PointOrientation(S);
                 break;

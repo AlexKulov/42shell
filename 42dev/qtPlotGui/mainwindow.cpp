@@ -9,7 +9,7 @@ QMainWindow(parent),
 ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    setWindowTitle("Simulation spacecraft");
+    setWindowTitle("42shell");
     connect (ui->pushButtonSimulation,&QAbstractButton::clicked,this,&MainWindow::StartSimulation);
     setupPlots();
 
@@ -68,6 +68,7 @@ extern "C"{
 #include "PSModel.h"
 #include "../42dev/serviceAlg.h"
 extern int exec(int argc,char **argv);
+extern long getSpsSoc(struct SCType *S, float * batSOC);
 
 void ToPlot(double Time);
 #ifdef __cplusplus
@@ -78,7 +79,7 @@ extern double modeAng[3];
 void ToPlot(double SimTime){
     mSimTime = SimTime;
     static unsigned int PlotSampleCounter=0;
-    static unsigned int PlotMaxCounter = 0;
+    static unsigned int PlotMaxCounter = 25;
 
     PlotSampleCounter++;
     if(PlotSampleCounter>PlotMaxCounter){
@@ -161,7 +162,12 @@ void ToPlot(double SimTime){
         }
 
         if(true){
-            extUi->Plot32->graph(0)->addData(SimTime, SC[0].Eclipse);
+            float batSOC[4];
+            long nBatSoc = getSpsSoc(&SC[0], batSOC);
+            if(nBatSoc>0)
+                extUi->Plot32->graph(0)->addData(SimTime, batSOC[0]);
+            else
+                extUi->Plot32->graph(0)->addData(SimTime, 0);
             extUi->Plot32->rescaleAxes();
             extUi->Plot32->replot();
         }

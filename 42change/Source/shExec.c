@@ -480,20 +480,24 @@ int exec(int argc,char **argv)
           Nipc = 0;
       }
 
-      #ifdef _ENABLE_GUI_
+
+      #ifdef _USE_IMPLOT_
       static long imGuiPlotEnable = 1;
-         if (GLEnable) {
-            HandoffToGui(argc,argv);
-         }
-         else if (imGuiPlotEnable) {
-             extern int HandoffToPlotGui(int argc, char **argv);
-             HandoffToPlotGui(argc,argv);
-         }
-         else {
+      if (imGuiPlotEnable) {
+          extern int HandoffToPlotGui(int argc, char **argv);
+          HandoffToPlotGui(argc,argv);
+          return(0);
+      }
+      #endif
+      #ifdef _ENABLE_GUI_
+      if (GLEnable) {
+          HandoffToGui(argc,argv);
+      }
+      else {
             while(!Done) {
-               Done = SimStep();
+                Done = SimStep();
             }
-         }
+      }
       #else
          /* Crunch numbers till done */
          while(!Done) {
