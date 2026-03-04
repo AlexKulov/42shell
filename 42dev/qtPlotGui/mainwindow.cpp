@@ -39,7 +39,9 @@ ui(new Ui::MainWindow)
     ui->Plot21->addGraph(); //plotKm
     ui->Plot21->graph(0)->setPen(QColor(Qt::red));
     ui->Plot21->addGraph(); //plotKm
-    ui->Plot21->graph(1)->setPen(QColor(Qt::blue));
+    ui->Plot21->graph(1)->setPen(QColor(Qt::green));
+    ui->Plot21->addGraph(); //plotKm
+    ui->Plot21->graph(2)->setPen(QColor(Qt::blue));
     ui->Plot22->addGraph();//plotWheelPower
     ui->Plot22->graph(0)->setPen(QColor(Qt::red));
     ui->Plot22->addGraph(); //plotKm
@@ -76,6 +78,7 @@ void ToPlot(double Time);
 #endif
 
 extern double modeAng[3];
+extern double tauSunMin;
 void ToPlot(double SimTime){
     mSimTime = SimTime;
     static unsigned int PlotSampleCounter=0;
@@ -84,7 +87,7 @@ void ToPlot(double SimTime){
     PlotSampleCounter++;
     if(PlotSampleCounter>PlotMaxCounter){
         PlotSampleCounter = 0;
-        if(true){
+        if(false){
             static double angLimit = 180;
             modeAng[0] = Limit(modeAng[0], -angLimit, angLimit);
             extUi->Plot11->graph(0)->addData(SimTime,modeAng[0]);
@@ -92,17 +95,23 @@ void ToPlot(double SimTime){
             extUi->Plot11->graph(1)->addData(SimTime,modeAng[1]);
             modeAng[2] = Limit(modeAng[2], -angLimit, angLimit);
             extUi->Plot11->graph(2)->addData(SimTime,modeAng[2]);
-            extUi->Plot11->rescaleAxes();
-            extUi->Plot11->replot();
         }
+        else if(true){
+            extUi->Plot11->graph(0)->addData(SimTime, modeAng[1]);
+        }
+        extUi->Plot11->rescaleAxes();
+        extUi->Plot11->replot();
 
-        if(true){
-            extUi->Plot12->graph(0)->addData(SimTime,SC[0].Thr[0].PulseWidthCmd);
-            //extUi->Plot12->graph(1)->addData(SimTime,SC[0].B[0].wn[1]);
-            //extUi->Plot12->graph(2)->addData(SimTime,SC[0].B[0].wn[2]);
-            extUi->Plot12->rescaleAxes();
-            extUi->Plot12->replot();
+        if(false){
+            extUi->Plot12->graph(0)->addData(SimTime, modeAng[1]);
         }
+        else if(true){
+            extUi->Plot12->graph(0)->addData(SimTime,SC[0].B[0].wn[0] * R2D);
+            extUi->Plot12->graph(1)->addData(SimTime,SC[0].B[0].wn[1] * R2D);
+            extUi->Plot12->graph(2)->addData(SimTime,SC[0].B[0].wn[2] * R2D);
+        }
+        extUi->Plot12->rescaleAxes();
+        extUi->Plot12->replot();
 
         if(true){
             if(false){
@@ -115,7 +124,7 @@ void ToPlot(double SimTime){
                 if(SC[0].Nw > 3)
                     extUi->Plot13->graph(3)->addData(SimTime,SC[0].Whl[3].Trq);
             }
-            else if(true){
+            else if(false){
                 if(SC[0].Nthr > 0)
                     extUi->Plot13->graph(0)->addData(SimTime,SC[0].Thr[0].F);
                 if(SC[0].Nthr > 1)
@@ -125,12 +134,19 @@ void ToPlot(double SimTime){
                 if(SC[0].Nthr > 4)
                     extUi->Plot13->graph(3)->addData(SimTime,SC[0].Thr[4].F);
             }
+            else if(true){
+                if(fabs(tauSunMin)>100){
+                    double sign = tauSunMin>0?1:-1;
+                    tauSunMin = 100 * sign;
+                }
+                extUi->Plot13->graph(0)->addData(SimTime, tauSunMin);
+            }
 
             extUi->Plot13->rescaleAxes();
             extUi->Plot13->replot();
         }
 
-        if(true){
+        if(false){
             double posN0 = 0;
             double posN1 = 0;
             posN0 = MAGV(SC[0].PosN) - World[EARTH].rad;
@@ -138,11 +154,17 @@ void ToPlot(double SimTime){
                 posN1 = MAGV(SC[1].PosN) - World[EARTH].rad;
             extUi->Plot21->graph(0)->addData(SimTime, posN1/1000);
             extUi->Plot21->graph(1)->addData(SimTime, posN0/1000);
-            extUi->Plot21->rescaleAxes();
-            extUi->Plot21->replot();
+        }
+        else if(true){
+            extUi->Plot21->graph(0)->addData(SimTime,SC[0].B[0].wn[0] * R2D);
+            extUi->Plot21->graph(1)->addData(SimTime,SC[0].B[0].wn[1] * R2D);
+            extUi->Plot21->graph(2)->addData(SimTime,SC[0].B[0].wn[2] * R2D);
         }
 
-        if(true){
+        extUi->Plot21->rescaleAxes();
+        extUi->Plot21->replot();
+
+        if(false){
             double magVelN0 = 0;
             double magVelN1 = 0;
             magVelN0 = MAGV(SC[0].VelN)/1000;
@@ -150,9 +172,13 @@ void ToPlot(double SimTime){
                 magVelN1 = MAGV(SC[1].VelN)/1000;
             extUi->Plot22->graph(0)->addData(SimTime, magVelN1);
             extUi->Plot22->graph(1)->addData(SimTime, magVelN0);
-            extUi->Plot22->rescaleAxes();
-            extUi->Plot22->replot();
         }
+        else if(true){
+            extUi->Plot22->graph(0)->addData(SimTime, modeAng[2]);
+        }
+
+        extUi->Plot22->rescaleAxes();
+        extUi->Plot22->replot();
 
         if(true){
             double fuelMassa = getThrsFuel(&SC[0],0);

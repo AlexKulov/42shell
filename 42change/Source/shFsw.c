@@ -68,6 +68,9 @@ void shFlightSoftWare(struct SCType *S)
             case NADIR_FSW:
                 NadirMode(S);
                 break;
+            case NADIR_SUN_FSW:
+                NadirSunMode(S);
+                break;
             case THR_LVLH_FSW:
                 ThrLvlhMode(S);
                 break;

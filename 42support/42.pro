@@ -27,7 +27,7 @@ else {
     ../42core/Source/42main.c
 }
 
-CONFIG += IMPLOT
+CONFIG -= IMPLOT
 IMPLOT {
     DEFINES += _USE_IMPLOT_
     INCLUDEPATH +=../42dev/imPlotGui \

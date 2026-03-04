@@ -13,6 +13,7 @@
 #define NADIR_FSW (335)
 #define THR_LVLH_FSW (336)
 #define RANDEZVOUS_FSW (337)
+#define NADIR_SUN_FSW (338)
 
 /*42dynamics func*/
 typedef struct SCType SCType;

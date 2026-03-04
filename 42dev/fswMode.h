@@ -8,6 +8,7 @@ extern "C" {
 void EasySunMode(struct SCType *S);
 void EasyLvlhMode(struct SCType *S);
 void NadirMode(struct SCType *S);
+void NadirSunMode(struct SCType *S);
 void PointOrientation(struct SCType *S);
 void ThrLvlhMode(struct SCType *S);
 

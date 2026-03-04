@@ -29,3 +29,12 @@ Compared to the native 42, added propulsion system, in which:
 1. Thr operation is calculated taking into account the thrust buildup and aftereffect impulse;   
 2. Total fuel consumption and the number of ignitions of each thr's are calculated.     
 ![4Mode Plot](../img/Thr.jpg)
+
+## NadirSunMode
+You must copy starlink.obj (mtl) and folder SlTextures to 42core/Model.
+It is obj sattelite model like starlink. (but this model is reduce).
+If you try full texture mode, you can free download all files (starlink_BaseColor.png) from
+https://sketchfab.com/3d-models/starlink-spacex-satellite-0a60f6720c5141c9a1c6d71aac108b31
+If you use your model, just rename in SC_Simple.txt:
+
+ 

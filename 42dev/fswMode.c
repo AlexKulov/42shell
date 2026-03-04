@@ -193,6 +193,199 @@ void NadirMode(struct SCType *S){
         modeAng[i] = 0;
     modeAng[0] = acos(VoV(PosB,genAxis))*R2D; //degree
 }
+/**********************************************************************/
+extern double tauSunMin = 0;
+static void formDCM(double m[3][3], double x[3],
+                    double y[3], double z[3]){
+    m[0][0] = x[0]; m[0][1] = x[1]; m[0][2] = x[2];
+    m[1][0] = y[0]; m[1][1] = y[1]; m[1][2] = y[2];
+    m[2][0] = z[0]; m[2][1] = z[1]; m[2][2] = z[2];
+
+}
+
+static double angleBetween(double q1[4], double q2[4]) {
+    double dq[4];
+    QxQT(q1, q2, dq);
+    UNITQ(dq);
+    // Scalar part of quat
+    double halfCos = Limit(dq[3], -1.0, 1.0);
+    // Ang by rad
+    return 2.0 * acos(halfCos);
+}
+
+/* .. a1, a2 must have normalize */
+/* .. Set support frame          */
+static void createFrame(double a1[3], double a2[3], double dcm[3][3]){
+    double b[3] = {0};
+    VxV(a2, a1, b);
+    UNITV(b);
+    double c[3] = {0};
+    VxV(a1, b, c);
+    UNITV(c);
+    formDCM(dcm, a1, b, c);
+}
+static void sunNadirDCM(double PosN[3], double svn[3], double SunNDCM[3][3]){
+    double earthVec[3] = {0};
+    CopyUnitV(PosN, earthVec);
+
+    /* We project the Sun onto a plane perpendicular to earthVec */
+    double dot = VoV(earthVec, svn);
+    double sunVec[3];
+    for(long i=0;i<3;i++)
+        sunVec[i] = svn[i] - dot * earthVec[i];
+
+    /* We normalize - this will be the Z axis (target direction of the panel) */
+    UNITV(sunVec);
+
+    /* The X axis complements the right three */
+    double xAxis[3] = {0};
+    VxV(earthVec, sunVec, xAxis);  // X = Y × Z
+    UNITV(xAxis);
+
+    /* Rotation matrix from the ISC to the solar-nadir SC:
+   X - additional axle
+   Y - nadir (fixed)
+   Z - Sun projection (optimal for the panel) */
+    formDCM(SunNDCM, xAxis, earthVec, sunVec);
+}
+
+void NadirSunMode(struct SCType *S){
+    double wln[3],CRN[3][3];
+    double qrn[4],qbr[4];
+    long i;
+    struct AcType *AC;
+    struct AcThreeAxisCtrlType *C;
+
+    AC = &S->AC;
+    C = &AC->ThreeAxisCtrl;
+
+    static double DSW[3][3];
+    static double amax = 0.01; // Max ang accel
+    static double vmax = 10; // Max ang rate
+    static double worb;
+    static long isSimpleCtrl = 1;
+    static long isPredictiveCtrl;
+    if (C->Init) {
+        C->Init = 0;
+        for(i=0;i<3;i++) {
+            FindPDGains(AC->MOI[i][i],0.1,0.7,
+                        &C->Kr[i],&C->Kp[i]);
+        }
+        /* Finde perpendicular to orbit */
+        FindCLN(S->PosN,S->VelN,CRN,wln);
+        worb = UNITV(wln);
+        createFrame(wln, S->svn, DSW);
+
+        amax = AC->Whl[1].Tmax/AC->MOI[1][1];
+        vmax = 10.0 * D2R;
+        /* Calculate possible max rate */
+        double betta = acos(VoV(S->svn, wln));
+        double wPeak = worb * tan(betta);
+        if(fabs(wPeak)>vmax){//then use Predictive Control
+            isPredictiveCtrl = 1;
+        }
+        /* Chek sensors and actuators */
+        if(AC->Nst == 0 || AC->Ngps==0 || AC->Ngyro<3){
+            printf("NadirSunMode: check SC sensors, Ngps=%li, Ngyro=%li\n",
+                   AC->Ngps, AC->Ngyro);
+        }
+    }
+    /* .. Sensor Processing */
+    GyroProcessing(AC);
+    GpsProcessing(AC);
+    StarTrackerProcessing(AC);
+    /* .. Ideal Star tracker */
+    for(i=0;i<4;i++)
+        AC->qbn[i] = S->B[0].qn[i];
+
+    /* Find Base Attitude Command */
+    FindCLN(AC->PosN,AC->VelN,CRN,wln);
+    double wlb[3];
+    QxV(AC->qbn,wln,wlb);
+
+    double therr[3] = {0};
+    double werr[3] = {0};
+    for(i=0;i<3;i++)
+        werr[i] = AC->wbn[i] - wlb[i];
+
+    /* Find Particular Attitude Command by case*/
+    double CSunNadir[3][3] = {0};
+
+    if(isSimpleCtrl){
+        sunNadirDCM(AC->PosN, S->svn, CSunNadir);
+        C2Q(CSunNadir, qrn);
+        /* Form Error Signals */
+        QxQT(AC->qbn,qrn,qbr);
+        RECTIFYQ(qbr);
+        Q2AngleVec(qbr, therr);
+        /* .. Control Low Processing */
+        for(i=0;i<3;i++){
+            AC->Tcmd[i] = -C->Kr[i]*werr[i]
+                          -C->Kp[i]*therr[i];
+        }
+    }
+
+    if(isPredictiveCtrl){
+        /* Find time fo extremal angle */
+        double R0[3] = {0};
+        MxV(DSW, AC->PosN, R0);
+        double alfa = atan2(R0[2], R0[1]);
+        tauSunMin = (M_PI_2 - alfa)/worb;
+        static double tauTurn;
+        static double predQbr[4] = {0, 0, 0, 1};
+        if(fabs(tauSunMin)<tauTurn){
+            /* Forming predictive return by 180 */
+            if(fabs(tauSunMin)<tauTurn){
+                /* propagation of PosN for set time */
+                worb = UNITV(wln);
+                double fi = 0;
+                if(tauSunMin>0)
+                    fi = worb*(2*tauTurn - tauSunMin);
+                else
+                    fi = worb*(tauSunMin+tauTurn);
+                double NewPosN[3] = {0};
+                SxV(cos(fi), AC->PosN, NewPosN);
+                double wxr0[3] = {0};
+                VxV(wln, AC->PosN, wxr0);
+                SxV(sin(fi), wxr0, wxr0);
+                for(i=0;i<3;i++)
+                    NewPosN[i] = NewPosN[i] + wxr0[i];
+
+                sunNadirDCM(NewPosN, S->svn, CSunNadir);
+                C2Q(CSunNadir, qrn);
+                /* Form Error Signals */
+                QxQT(AC->qbn,qrn,predQbr);
+                RECTIFYQ(predQbr);
+            }
+
+            modeAng[2] = angleBetween(predQbr, qbr)*R2D;
+            Q2AngleVec(predQbr, therr);
+
+            /* Closed-loop attitude control */
+            double wc = 0.05*TwoPi;
+            double alpha[3] = {0};
+            VectorRampCoastGlide(therr, werr,
+                                 wc, amax, vmax,alpha);
+            for(i=0;i<3;i++)
+                AC->Tcmd[i] = AC->MOI[i][i]*alpha[i];
+        }
+        else{
+            double dw = vmax - fabs(AC->wbn[1]);
+            tauTurn = 0.5*(M_PI/vmax + dw*dw/(amax*vmax));
+            modeAng[2] = 0;
+        }
+    }
+    /* .. Actuator Processing */
+    WheelProcessing(AC);
+
+    /* .. Parameters for plots */
+    double b2b[3] = {0,1,0};
+    double b2i[3] = {0};
+    QTxV(AC->qbn,b2b,b2i);
+    double b3b[3] = {0,0,1};
+    modeAng[0] = acos(VoV(AC->PosN, b2i))*R2D; //degree
+    modeAng[1] = acos(VoV(S->svb, b3b))*R2D; //degree
+}
 
 /**********************************************************************/
 /**********************************************************************/
