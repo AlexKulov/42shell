@@ -28,7 +28,7 @@ NONE                        ! Shaker File Name
 1                           ! Number of Bodies
 ================================ Body 0 ================================
 10.0                       ! Mass
-10.0  20.0  30.0         ! Moments of Inertia (kg-m^2)
+100.0  30.0  120.0         ! Moments of Inertia (kg-m^2)
 0.0  0.0  0.0               ! Products of Inertia (xy,xz,yz)
 0.0  0.0  0.0               ! Location of mass center, m
 0.0  0.0  0.0               ! Constant Embedded Momentum (Nms)

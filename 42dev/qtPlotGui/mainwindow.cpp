@@ -135,11 +135,7 @@ void ToPlot(double SimTime){
                     extUi->Plot13->graph(3)->addData(SimTime,SC[0].Thr[4].F);
             }
             else if(true){
-                if(fabs(tauSunMin)>100){
-                    double sign = tauSunMin>0?1:-1;
-                    tauSunMin = 100 * sign;
-                }
-                extUi->Plot13->graph(0)->addData(SimTime, tauSunMin);
+                extUi->Plot13->graph(0)->addData(SimTime, modeAng[1]);
             }
 
             extUi->Plot13->rescaleAxes();
@@ -181,8 +177,9 @@ void ToPlot(double SimTime){
         extUi->Plot22->replot();
 
         if(true){
-            double fuelMassa = getThrsFuel(&SC[0],0);
-            extUi->Plot31->graph(0)->addData(SimTime, fuelMassa);
+            //double fuelMassa = getThrsFuel(&SC[0],0);
+            extern double summEnergi;
+            extUi->Plot31->graph(0)->addData(SimTime, summEnergi);
             extUi->Plot31->rescaleAxes();
             extUi->Plot31->replot();
         }

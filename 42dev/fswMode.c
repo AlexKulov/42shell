@@ -249,6 +249,7 @@ static void sunNadirDCM(double PosN[3], double svn[3], double SunNDCM[3][3]){
     formDCM(SunNDCM, xAxis, earthVec, sunVec);
 }
 
+double summEnergi = 0;
 void NadirSunMode(struct SCType *S){
     double wln[3],CRN[3][3];
     double qrn[4],qbr[4];
@@ -263,7 +264,6 @@ void NadirSunMode(struct SCType *S){
     static double amax = 0.01; // Max ang accel
     static double vmax = 10; // Max ang rate
     static double worb;
-    static long isSimpleCtrl = 1;
     static long isPredictiveCtrl;
     if (C->Init) {
         C->Init = 0;
@@ -277,13 +277,14 @@ void NadirSunMode(struct SCType *S){
         createFrame(wln, S->svn, DSW);
 
         amax = AC->Whl[1].Tmax/AC->MOI[1][1];
-        vmax = 10.0 * D2R;
+        vmax = 1.0 * D2R;
         /* Calculate possible max rate */
         double betta = acos(VoV(S->svn, wln));
         double wPeak = worb * tan(betta);
         if(fabs(wPeak)>vmax){//then use Predictive Control
             isPredictiveCtrl = 1;
         }
+
         /* Chek sensors and actuators */
         if(AC->Nst == 0 || AC->Ngps==0 || AC->Ngyro<3){
             printf("NadirSunMode: check SC sensors, Ngps=%li, Ngyro=%li\n",
@@ -311,17 +312,19 @@ void NadirSunMode(struct SCType *S){
     /* Find Particular Attitude Command by case*/
     double CSunNadir[3][3] = {0};
 
-    if(isSimpleCtrl){
-        sunNadirDCM(AC->PosN, S->svn, CSunNadir);
-        C2Q(CSunNadir, qrn);
-        /* Form Error Signals */
-        QxQT(AC->qbn,qrn,qbr);
-        RECTIFYQ(qbr);
-        Q2AngleVec(qbr, therr);
-        /* .. Control Low Processing */
-        for(i=0;i<3;i++){
-            AC->Tcmd[i] = -C->Kr[i]*werr[i]
-                          -C->Kp[i]*therr[i];
+    sunNadirDCM(AC->PosN, S->svn, CSunNadir);
+    C2Q(CSunNadir, qrn);
+    /* Form Error Signals */
+    QxQT(AC->qbn,qrn,qbr);
+    RECTIFYQ(qbr);
+    Q2AngleVec(qbr, therr);
+    /* .. Control Low Processing */
+    for(i=0;i<3;i++){
+        AC->Tcmd[i] = -C->Kr[i]*werr[i]
+                      -C->Kp[i]*therr[i];
+        if(AC->wbn[i]>vmax && AC->Tcmd[i]>0 ||
+           AC->wbn[i]<-vmax && AC->Tcmd[i]<0){
+            AC->Tcmd[i]=-AC->Tcmd[i];
         }
     }
 
@@ -366,8 +369,8 @@ void NadirSunMode(struct SCType *S){
             double alpha[3] = {0};
             VectorRampCoastGlide(therr, werr,
                                  wc, amax, vmax,alpha);
-            for(i=0;i<3;i++)
-                AC->Tcmd[i] = AC->MOI[i][i]*alpha[i];
+            i=1;
+            AC->Tcmd[i] = AC->MOI[i][i]*alpha[i];
         }
         else{
             double dw = vmax - fabs(AC->wbn[1]);
@@ -376,6 +379,7 @@ void NadirSunMode(struct SCType *S){
         }
     }
     /* .. Actuator Processing */
+
     WheelProcessing(AC);
 
     /* .. Parameters for plots */
@@ -384,7 +388,10 @@ void NadirSunMode(struct SCType *S){
     QTxV(AC->qbn,b2b,b2i);
     double b3b[3] = {0,0,1};
     modeAng[0] = acos(VoV(AC->PosN, b2i))*R2D; //degree
-    modeAng[1] = acos(VoV(S->svb, b3b))*R2D; //degree
+    double cosSun = VoV(S->svb, b3b);
+    modeAng[1] = acos(cosSun)*R2D; //degree
+    if(!S->Eclipse)
+       summEnergi = summEnergi + cosSun*DTSIM;
 }
 
 /**********************************************************************/
