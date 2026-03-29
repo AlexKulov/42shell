@@ -67,6 +67,172 @@ void EasySunMode(struct SCType *S){
     modeAng[0] = acos(VoV(S->svb,C.fvb))*R2D; //degree
 }
 
+// Функция поворота вектора с помощью кватерниона
+void QuatRotate(double q[4], double v_in[3], double v_out[3]) {
+    // q = [q0, q1, q2, q3] - кватернион поворота
+    // v_in - вектор в исходной системе координат
+    // v_out - вектор в повернутой системе координат
+
+    double q0 = q[0];
+    double q1 = q[1];
+    double q2 = q[2];
+    double q3 = q[3];
+
+    // Матрица поворота из кватерниона
+    double R[3][3];
+
+    R[0][0] = 2*(q0*q0 + q1*q1) - 1;
+    R[0][1] = 2*(q1*q2 - q0*q3);
+    R[0][2] = 2*(q1*q3 + q0*q2);
+
+    R[1][0] = 2*(q1*q2 + q0*q3);
+    R[1][1] = 2*(q0*q0 + q2*q2) - 1;
+    R[1][2] = 2*(q2*q3 - q0*q1);
+
+    R[2][0] = 2*(q1*q3 - q0*q2);
+    R[2][1] = 2*(q2*q3 + q0*q1);
+    R[2][2] = 2*(q0*q0 + q3*q3) - 1;
+
+    // Применяем матрицу поворота
+    for (int i = 0; i < 3; i++) {
+        v_out[i] = 0;
+        for (int j = 0; j < 3; j++) {
+            v_out[i] += R[i][j] * v_in[j];
+        }
+    }
+}
+
+void StarTrackerSunMode(struct SCType *S) {
+    struct AcType *AC = &S->AC;
+    struct StarTrackerType *ST = &AC->ST[0];
+    long i;
+
+    // Инициализация
+    if (C.Init) {
+        C.Init = 0;
+
+        if (AC->Nst > 0 && AC->ST != NULL) {
+            // Устанавливаем ось зрения звездного датчика (обычно Z-ось)
+            ST->BoreAxis = 2; // Индекс оси Z (0-X, 1-Y, 2-Z)
+            printf("StarTracker[0].BoreAxis set to Z-axis (index %ld)\n", ST->BoreAxis);
+        }
+
+        // Целевой вектор ориентации на Солнце (ось Z)
+        C.fvb[0] = 0;
+        C.fvb[1] = 0;
+        C.fvb[2] = 1;
+
+        // Настройка ПИД коэффициентов по моментам инерции
+        for (i = 0; i < 3; i++) {
+            FindPDGains(AC->MOI[i][i], 0.1, 0.7,
+                        &C.AngRateGain[i], &C.AngGain[i]);
+        }
+
+        // Проверка наличия данных с звездного датчика и гироскопов
+        if (AC->Nst == 0 || AC->Ngyro < 3) {
+            printf("StarTrackerSunMode: check sensors, Nstars=%li, Ngyro=%li\n",
+                   AC->Nst, AC->Ngyro);
+        }
+    }
+
+    if (AC->Nst < 1 || AC->ST == NULL) {
+        printf("No valid StarTracker allocated\n");
+        return;
+    }
+
+    // Обработка гироскопов
+    GyroProcessing(AC);
+
+    // Обработка данных звездного датчика
+    StarTrackerProcessing(AC);
+
+    // Проверка валидности данных
+    if (!ST->Valid) {
+        printf("StarTracker data invalid, skipping control update\n");
+        return; // Пропуск управления при недостоверных данных
+    }
+
+    // Получение текущей ориентации из кватерниона звездного датчика
+    double q_current[4]; // Кватернион [q0, q1, q2, q3]
+    double sun_vector_body[3]; // Вектор на Солнце в связанной СК
+
+    // Копируем кватернион из данных звездного датчика (используем qn вместо q)
+    for (i = 0; i < 4; i++) {
+        q_current[i] = ST->qn[i];
+    }
+
+    // Целевой вектор направления на Солнце в инерциальной СК
+    double sun_vector_inertial[3] = {0, 0, 1}; // Солнце вдоль оси Z инерциальной СК
+
+    // Преобразуем вектор на Солнце из инерциальной в связанную СК
+    // Используем кватернион для поворота: v_body = q * v_inertial * q^(-1)
+    QuatRotate(q_current, sun_vector_inertial, sun_vector_body);
+
+    // Ось зрения звездного датчика (должна быть направлена на Солнце)
+    long bore_axis = ST->BoreAxis; // Индекс оси (0-X, 1-Y, 2-Z)
+
+    if (bore_axis < 0 || bore_axis > 2) {
+        printf("Invalid BoreAxis: %ld\n", bore_axis);
+        return;
+    }
+
+    // Получаем текущий вектор оси зрения в связанной СК
+    double bore_vector_body[3] = {0, 0, 0};
+    bore_vector_body[bore_axis] = 1.0;
+
+    // Вычисляем векторную ошибку между осью зрения и направлением на Солнце
+    double errorVec[3];
+    VxV(bore_vector_body, sun_vector_body, errorVec);
+
+    // Нормализуем ошибку для ПИД-регулятора
+    double error_norm = sqrt(errorVec[0]*errorVec[0] +
+                             errorVec[1]*errorVec[1] +
+                             errorVec[2]*errorVec[2]);
+
+    if (error_norm > 1e-6) {
+        for (i = 0; i < 3; i++) {
+            errorVec[i] /= error_norm;
+        }
+    }
+
+    // Формирование управляющего момента ПИД-регулятором
+    for (i = 0; i < 3; i++) {
+        AC->Tcmd[i] = -C.AngRateGain[i] * AC->wbn[i] - C.AngGain[i] * errorVec[i];
+    }
+
+    // Ограничение управляющего момента (опционально)
+    double max_torque = 0.1; // Максимальный момент в Нм
+    double torque_norm = sqrt(AC->Tcmd[0]*AC->Tcmd[0] +
+                              AC->Tcmd[1]*AC->Tcmd[1] +
+                              AC->Tcmd[2]*AC->Tcmd[2]);
+
+    if (torque_norm > max_torque && torque_norm > 1e-10) {
+        for (i = 0; i < 3; i++) {
+            AC->Tcmd[i] = (AC->Tcmd[i] / torque_norm) * max_torque;
+        }
+    }
+
+    // Передача управляющих команд на маховики
+    WheelProcessing(AC);
+
+    // Вычисление и вывод угла отклонения оси зрения от направления на Солнце
+    double cosAngle = bore_vector_body[0]*sun_vector_body[0] +
+                      bore_vector_body[1]*sun_vector_body[1] +
+                      bore_vector_body[2]*sun_vector_body[2];
+
+    // Ограничиваем косинус угла во избежание численных ошибок
+    if (cosAngle > 1.0) cosAngle = 1.0;
+    if (cosAngle < -1.0) cosAngle = -1.0;
+
+    double angleDeg = acos(cosAngle) * 57.29577951308232; // R2D
+    printf("StarTrackerSunMode angle deviation: %.2f degrees\n", angleDeg);
+
+    // Дополнительно выводим информацию о кватернионе для отладки
+    printf("  Quaternion: [%.4f, %.4f, %.4f, %.4f]\n",
+           q_current[0], q_current[1], q_current[2], q_current[3]);
+}
+
+
 /**********************************************************************/
 void EasyLvlhMode(struct SCType *S){
       double wln[3],CRN[3][3];

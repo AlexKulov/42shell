@@ -247,10 +247,12 @@ long DecodeString(char *s)
       else if (!strcmp(s,"DYN_ONE_BODY")) return DYN_ONE_BODY;
       else if (!strcmp(s,"PROTOTYPE_FSW")) return PROTOTYPE_FSW;
       else if (!strcmp(s,"AD_HOC_FSW")) return AD_HOC_FSW;
+      else if (!strcmp(s,"STARTRACKER_SUN_FSW")) return STARTRACKER_SUN_FSW;
       else if (!strcmp(s,"SUN_FSW")) return SUN_FSW;
       else if (!strcmp(s,"LVLH_FSW")) return LVLH_FSW;
       else if (!strcmp(s,"POINT_FSW")) return POINT_FSW;
       else if (!strcmp(s,"NADIR_FSW")) return NADIR_FSW;
+
 
       else {
          printf("Bogus input %s in DecodeString (42init.c:%d)\n",s,__LINE__);

@@ -35,6 +35,7 @@ extern void EasyLvlhMode(struct SCType *S);
 extern void PointOrientation(struct SCType *S);
 extern void NadirMode(struct SCType *S);
 extern void MapCmdsToActuators(struct SCType *S);
+extern void StarTrackerSunMode (struct SCType *S);
 void shFlightSoftWare(struct SCType *S)
 {
       #ifdef _AC_STANDALONE_
@@ -63,6 +64,9 @@ void shFlightSoftWare(struct SCType *S)
                 break;
             case NADIR_FSW:
                 NadirMode(S);
+                break;
+            case STARTRACKER_SUN_FSW:
+                StarTrackerSunMode(S);
                 break;
 
          }

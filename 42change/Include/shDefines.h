@@ -25,5 +25,5 @@
 #define LVLH_FSW (333)
 #define POINT_FSW (334)
 #define NADIR_FSW (335)
-
+#define STARTRACKER_SUN_FSW (336)
 #endif /* __42DEFINES_H__ */
