@@ -4,7 +4,7 @@
 #include <time.h>
 
 #include <GL/glut.h>
-#include "freeglut_ext.h"
+#include "GL/freeglut_ext.h"
 
 #include "imgui.h"
 #include "imgui_impl_glut.h"

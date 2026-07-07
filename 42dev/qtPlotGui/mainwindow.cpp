@@ -68,7 +68,7 @@ extern "C"{
 #include "42.h"
 #include "SPSModel.h"
 #include "PSModel.h"
-#include "../42dev/serviceAlg.h"
+#include "fswAlg.h"
 extern int exec(int argc,char **argv);
 extern long getSpsSoc(struct SCType *S, float * batSOC);
 

@@ -194,7 +194,7 @@ void NadirMode(struct SCType *S){
     modeAng[0] = acos(VoV(PosB,genAxis))*R2D; //degree
 }
 /**********************************************************************/
-extern double tauSunMin = 0;
+double tauSunMin = 0;
 static void formDCM(double m[3][3], double x[3],
                     double y[3], double z[3]){
     m[0][0] = x[0]; m[0][1] = x[1]; m[0][2] = x[2];

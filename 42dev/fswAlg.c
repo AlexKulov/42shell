@@ -10,6 +10,37 @@
 #include "fswAlg.h"
 
 extern double D2R;
+extern double R2D;
+
+/**********************************************************************/
+/**********************************************************************/
+/*                 Support Analys Function                            */
+
+void SUMMV(const double a[3], const double b[3], double c[3]){
+    c[0]=a[0]+b[0];
+    c[1]=a[1]+b[1];
+    c[2]=a[2]+b[2];
+}
+
+/********* lat, lng reference by degree ***************/
+static void ECIToWGS84(double PosN[3],
+                double * lat, double * lng, double * alt){
+    double GoalW[3] = {0};
+    VxMT(PosN ,World[EARTH].CWN, GoalW);
+    ECEFToWGS84(GoalW, lat, lng, alt);
+    *lat = *lat * R2D;
+    *lng = *lng * R2D;
+}
+
+void WSG84ToECI(double lat, double lng, double alt, double PosN[3]){
+
+    double latRad = lat * D2R;
+    double lngRad = lng * D2R;
+    double GoalW[3];
+    WGS84ToECEF(latRad, lngRad, alt, GoalW);
+    //may be in feature be note how calc CWN
+    VxM(GoalW,World[EARTH].CWN,PosN);
+}
 
 double angEarthPoint2BodyAxis(struct SCType *S,
                               double goalLat, double goalLng, double goalAlt, double bodyAxis[3]){
@@ -22,19 +53,71 @@ double angEarthPoint2BodyAxis(struct SCType *S,
     return angGoalDirectInBody;
 }
 
+/**
+ * @brief Находит расстояние до пересечения луча с эллипсоидом Земли (WGS84).
+ *
+ * @param PosN массив — точка старта луча (геоцентрические координаты, м).
+ * @param DirN массив — единичный вектор направления луча.
+ * @return long признак наличия пересечения
+ */
+long crossEarthSurface(double PosN[3], double DirN[3], double PosE[3]){
+    // Параметры эллипсоида WGS84
+    const double a = 6378137.0;
+    const double f = 1.0 / 298.257223563;
+    const double b = a * (1.0 - f);
+    const double a2 = a * a;
+    const double b2 = b * b;
+
+    //elipsoid func x^2/a^2+y^2/a^2+z^2/b^2=1
+    //line func p=p0+d⋅t
+    //make A*t^2 + B*t + C = 0
+    double A =  (DirN[0]*DirN[0] + DirN[1]*DirN[1]) / a2 + (DirN[2]*DirN[2]) / b2;
+    double B = ((PosN[0]*DirN[0] + PosN[1]*DirN[1]) / a2 + (PosN[2]*DirN[2]) / b2) * 2.0;
+    double C =  (PosN[0]*PosN[0] + PosN[1]*PosN[1]) / a2 + (PosN[2]*PosN[2]) / b2 - 1.0;
+
+    double D = B*B - 4.0*A*C;
+
+    double t1=0, t2=0;
+    double tmin = 0.0;   // ближайший корень по модулю
+    if (D > 0.0){
+        double sqrtD = sqrt(D);
+        t1 = (-B - sqrtD) / (2.0 * A);
+        t2 = (-B + sqrtD) / (2.0 * A);
+
+        // Обработка t1
+        if (t1 > 0.0 && t2 > 0.0){
+            tmin = t1 >= t2 ? t2 : t1;
+        }
+        else
+            return 0;
+    }
+    else
+        return 0;
+
+    PosE[0] = PosN[0] + DirN[0] * tmin;
+    PosE[1] = PosN[1] + DirN[1] * tmin;
+    PosE[2] = PosN[2] + DirN[2] * tmin;
+
+    return 1;
+}
+
+long lagLngPointing(struct SCType *S, double axisB[3],
+                    double * lat, double * lng){
+    double axisN[3] = {0};
+    QTxV(S->B[0].qn,axisB, axisN); //- перевод из ССК в ИСК
+    UNITV(axisN);
+    double surfacePosN[3] = {0};
+    if(crossEarthSurface(S->PosN, axisN, surfacePosN)){
+        double alt[1] = {0};
+        ECIToWGS84(surfacePosN, lat, lng, alt);
+        return 1;
+    }
+    return 0;
+}
+
 /**********************************************************************/
 /**********************************************************************/
 /*                    Pointing Orientation                            */
-/********* lat, lng reference by degree ***************/
-void WSG84ToECI(double lat, double lng, double alt, double PosN[3]){
-
-    double latRad = lat * D2R;
-    double lngRad = lng *D2R;
-    double GoalW[3];
-    WGS84ToECEF(latRad, lngRad, alt, GoalW);
-    //may be in feature be note how calc CWN
-    VxM(GoalW,World[EARTH].CWN,PosN);
-}
 /* return radian */
 double angEarthPointNegAxis(struct SCType *S, double eartPointN[3], double bodyAxis[3]){
     double  GoalYN[3];
@@ -48,12 +131,6 @@ double angEarthPointNegAxis(struct SCType *S, double eartPointN[3], double bodyA
     for(i=0;i<3;i++)
         bodyAxis[i] = -bodyAxis[i];
     return acos(VoV(GoalYB,bodyAxis));
-}
-
-void SUMMV(const double a[3], const double b[3], double c[3]){
-    c[0]=a[0]+b[0];
-    c[1]=a[1]+b[1];
-    c[2]=a[2]+b[2];
 }
 
 void FindNWref (double ScRi[3], const double ScVi[3], const double PointRi[3],
