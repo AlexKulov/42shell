@@ -13,6 +13,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../../42core)
 option(QTPLOT "Enable Qt-based plotting (replaces console main)" OFF)
 option(IMPLOT "Enable ImPlot plotting (requires 42GUI)" OFF)
 option(42GUI "Enable User interface by 42 origin" OFF)
+option(cJSON+ "Enable cJSON output for Report+" OFF)
 # --------------------------------------------------------------
 
 # Include path for headers
@@ -45,6 +46,7 @@ set(BASE_SOURCES
     ../42core/Source/42jitter.c
     ../42core/Source/42joints.c
     ../42core/Source/42optics.c
+    ../42core/Source/42report.c
     ../42core/Source/AcApp.c
     ../42core/Source/42dynamics.c
     ../42core/Source/42fsw.c
@@ -62,6 +64,10 @@ set(BASE_SOURCES
     ../42change/Source/shFsw.c
     ../42change/Source/shIokit.c
     ../42change/Source/shExec.c
+    ../42dev/report+/Interface.c
+    ../42dev/report+/ViewWindow.c
+    ../42dev/report+/FlightData.c
+    ../42dev/report+/Common.c
 )
 
 # --------------------------------------------------------------
@@ -132,6 +138,15 @@ if(42GUI)
     )
 endif()
 # --------------------------------------------------------------
+if(cJSON+)
+    # Support json output
+    list(APPEND SOURCES
+        ../42dev/report+/cJSON/cJSON.c
+    )
+
+    include_directories(../42dev/report+/cJSON)
+endif()
+# --------------------------------------------------------------
 if(IMPLOT OR 42GUI)# include GLEW и freeglut
     include_directories(
         glew/include/GL
@@ -165,6 +180,12 @@ if(42GUI)# include GLEW и freeglut
         _ENABLE_GUI_
         _USE_SHADERS_
         _USE_GLUT_
+    )
+endif()
+
+if(cJSON+)# support cjson output file
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+        _CJSON_PLUS_
     )
 endif()
 
