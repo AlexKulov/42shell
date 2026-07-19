@@ -18,6 +18,11 @@ extern void calculateScScContact(void);*/
  */
 static long isFlightDataCalculate  = FALSE;
 static long isViewWindowCalculate  = FALSE;
+double halfAngleView = 0;
+long isTargetDirCalculate  = FALSE;
+static double outTime = 0;
+long maxCntOut = 0;
+
 static long isScGsPlanContactCalculate  = FALSE;
 static long isScScPlanContactCalculate  = FALSE;
 
@@ -40,7 +45,18 @@ void initExtReport(void){
 
     fscanf(csgFlagFile,"%s %[^\n] %[\n]",response,junk,&newline);
     isViewWindowCalculate = DecodeString(response);
+    fscanf(csgFlagFile,"%lf %s %lf %[^\n] %[\n]", &halfAngleView,
+           response, &outTime,junk,&newline);
+    isTargetDirCalculate = DecodeString(response);
+    if (outTime < DTSIM){
+        printf("Warning! initExtReport: outTime < DTSIM\n");
+        maxCntOut = 1;
+    }
+    else{
+        maxCntOut = (long) (outTime/DTSIM+0.5);
+    }
     printf("Flag View Window calculate: %s\n",response);
+
 
     fscanf(csgFlagFile,"%s %[^\n] %[\n]",response,junk,&newline);
     isScGsPlanContactCalculate = DecodeString(response);
@@ -75,17 +91,17 @@ void ExtReport(void){
 #ifdef _CJSON_PLUS_
 extern void outputFlightData(void);
 extern void outputViewWindow(void);
-extern void outputScGsContact(void);
-extern void outputScScContact(void);
+//extern void outputScGsContact(void);
+//extern void outputScScContact(void);
 
 void ExtReportToFile(void){
     if(isFlightDataCalculate)
         outputFlightData();
     if(isViewWindowCalculate)
         outputViewWindow();
-    if(isScGsPlanContactCalculate)
+    /*if(isScGsPlanContactCalculate)
         outputScGsContact();
     if(isScScPlanContactCalculate)
-        outputScScContact();
+        outputScScContact();*/
 }
 #endif

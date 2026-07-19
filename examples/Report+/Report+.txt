@@ -1,0 +1,7 @@
+<<<<<<<<<<  42-CSG: Flag for calculate in CSG Module  >>>>>>>>>
+*************************** CSG Flag **************************
+TRUE					!  Flag Flight Data calculate
+TRUE					!  Flag View Window calculate, Target Direct, Step Size [sec]
+35 TRUE 5				!  If Flag VW=TRUE: Half Angle VW [gr], Target Direct?, Step Size [sec]   
+TRUE					!  Flag Sc to Gs Plan Contact calculate
+TRUE					!  Flag Sc to Sc Plan Contact calculate

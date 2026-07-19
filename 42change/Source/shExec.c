@@ -18,6 +18,7 @@
 #include "shHeaders.h"
 #include "SPSModel.h"
 #include "PSModel.h"
+#include "report+/Interface.h"
 
 /* #ifdef __cplusplus
 ** namespace _42 {
@@ -363,10 +364,6 @@ static void shDynamics(struct SCType *S){
     }
 }
 
-static void shFeakReport(){
-
-}
-
 extern void shFlightSoftWare(struct SCType *S);
 extern void shActuators(struct SCType *S);
 
@@ -401,7 +398,8 @@ long SimStep(void)
                InitSPSModel(S->Label);
             }
          }
-         shFeakReport();  /* File Output */
+         //Report();  /* File Output */
+         initExtReport();
       }
 
       ReportProgress();
@@ -435,7 +433,8 @@ long SimStep(void)
             PartitionForces(S); /* Orbit-affecting and "internal" */
          }
       }
-      shFeakReport();  /* File Output */
+      //Report();  /* File Output */
+      ExtReport();
 
       #ifdef _USE_QTPLOT_
       ToPlot(SimTime);
@@ -448,6 +447,7 @@ long SimStep(void)
             printf("     Sim Speed = %8.2lf x Real\n",
                STOPTIME/TotalRunTime);
          }
+         ExtReportToFile();
       }
       return(SimComplete);
 

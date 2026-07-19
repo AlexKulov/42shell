@@ -1,5 +1,9 @@
 #include "Common.h"
 
+extern double halfAngleView;
+extern long isTargetDirCalculate;
+extern long maxCntOut;
+
 /*
  * https://ru.wikipedia.org/wiki/Решение_треугольников
  */
@@ -31,32 +35,48 @@ static BOOL * isVisibleGoalBySc;
 static BOOL * isVisibleGoalByScPrev;
 static double * beginVwTime;
 static double * endVwTime;
-typedef struct ViewWindows{
 
+#define LABLE_SIZE (10)
+#define DIR_SIZE (20)
+typedef struct ViewWindows{
+    char goalLabel[LABLE_SIZE];
+    char scLabel[LABLE_SIZE];
+    double begin;
+    double end;
+    uint8_t cntDir;
+    double dirArray[DIR_SIZE][3]; //направление на цель в ОСК
 }ViewWindows;
+static ViewWindows * vw;
+
+#define MAX_VW (100)
+static uint8_t cntVw = 0;
+static ViewWindows * vwArrayTotal[MAX_VW];
+long * cntOut;
+
 #ifdef _CJSON_PLUS_
-static cJSON * vwArray;
+
 #endif
-static double halfAngleView;
 
 long initViewWindow(void){
     unsigned int nCombination = (unsigned int) (Nsc*Ngnd);
     isVisibleGoalBySc     = (BOOL *)calloc(nCombination,sizeof(BOOL));
     isVisibleGoalByScPrev = (BOOL *)calloc(nCombination,sizeof(BOOL));
     beginVwTime     = (double *)calloc(nCombination,sizeof(double));
+    cntOut = (long *)calloc(nCombination,sizeof(long));
+    for(int i=0;i<nCombination;i++){
+        cntOut[i] = maxCntOut;
+    }
+    vw = (ViewWindows *)calloc(nCombination,sizeof(ViewWindows));
     //переменная для контроля, вообще можно и без неё (!)
     endVwTime = (double *)calloc(nCombination,sizeof(double));
 
-    halfAngleView = 35.0*D2R;
-    #ifdef _CJSON_PLUS_
-    vwArray = cJSON_CreateArray();
-    #endif
+    halfAngleView = halfAngleView*D2R;
     return 0;
 }
 
 static void checkMoreTimeThan(double moreTime , double lessTime){
     if(lessTime>moreTime){
-        printf("Error in calculateViewWindow(...)\n");
+        printf("Error in Report+:checkMoreTimeThan()\n");
         exit(0);
     }
 }
@@ -113,6 +133,7 @@ static void NEGV(double v[3]){
     v[1] = -v[1];
     v[2] = -v[2];
 }
+
 void calculateViewWindow(void){
 
     double lGoalToSc[3] = {0};
@@ -141,27 +162,40 @@ void calculateViewWindow(void){
 
             if(isVisibleGoalByScPrev[num] == FALSE && isVisibleGoalBySc[num] == TRUE){
                 beginVwTime[num] = CivilTime;
-                checkMoreTimeThan(endVwTime[num], beginVwTime[num]);
+                checkMoreTimeThan(beginVwTime[num], endVwTime[num]);
+                vw[num].cntDir = 0;
+                cntOut[num] = maxCntOut;
             }
             else if(isVisibleGoalByScPrev[num] == TRUE && isVisibleGoalBySc[num] == FALSE){
                 endVwTime[num] = CivilTime;
-                checkMoreTimeThan(beginVwTime[num], endVwTime[num]);
-
-                #ifdef _CJSON_PLUS_
-                cJSON * vw = cJSON_CreateObject();
-                cJSON_AddStringToObject(vw, "goalLabel", GroundStation[Ig].Label);
-                cJSON_AddStringToObject(vw, "scLabel"  , SC[Isc].Label);
-                cJSON_AddNumberToObject(vw, "begin", beginVwTime[num]+SEC_2000_1970);
-                cJSON_AddNumberToObject(vw, "end", endVwTime[num]+SEC_2000_1970);
-                cJSON_AddItemToArray(vwArray,vw);
-                #endif
+                checkMoreTimeThan(endVwTime[num], beginVwTime[num]);
+                strcpy(vw[num].goalLabel, GroundStation[Ig].Label);
+                strcpy(vw[num].scLabel, SC[Isc].Label);
+                vw[num].begin = beginVwTime[num]+SEC_2000_1970;
+                vw[num].end   = endVwTime[num]+SEC_2000_1970;
+                vwArrayTotal[cntVw] = (ViewWindows *)calloc(1,sizeof(ViewWindows));
+               *vwArrayTotal[cntVw] = vw[num];
+                cntVw++;
             }
-            else if(isVisibleGoalByScPrev[num] && isVisibleGoalBySc[num]){
-                double CON[3][3] = {0};
-                FindCON(SC[Isc].PosN,SC[Isc].VelN, CON);
-                double gDir[3] = {0};
-                MxV(CON, lGoalToSc, gDir);
-                NEGV(gDir);
+            else if(isTargetDirCalculate &&
+                    isVisibleGoalByScPrev[num] && isVisibleGoalBySc[num]){
+                if(cntOut[num] >= maxCntOut){
+                    double CON[3][3] = {0};
+                    FindCON(SC[Isc].PosN,SC[Isc].VelN, CON);
+                    double tDir[3] = {0};
+                    double lGoalToScN[3] = {0};
+                    MTxV(World[EARTH].CWN, lGoalToSc, lGoalToScN);
+                    MxV(CON, lGoalToScN, tDir);
+                    UNITV(tDir);
+                    NEGV(tDir);
+                    uint8_t cntDir = vw[num].cntDir >= (DIR_SIZE-1) ? DIR_SIZE-1 : vw[num].cntDir;
+                    CopyUnitV(tDir, vw[num].dirArray[cntDir]);
+                    cntDir++;
+                    vw[num].cntDir = cntDir;
+                    cntOut[num] = 0;
+                }
+                else
+                    cntOut[num]++;
             }
 
             isVisibleGoalByScPrev[num]=isVisibleGoalBySc[num];
@@ -170,6 +204,26 @@ void calculateViewWindow(void){
 
 #ifdef _CJSON_PLUS_
 void outputViewWindow(void){
-    outputConsolFile(vwArray,"csgViewWindow");
+    cJSON * jsonVwArray = cJSON_CreateArray();
+    for(int i=0; i<cntVw; i++){
+        cJSON * jsonVw = cJSON_CreateObject();
+        cJSON_AddStringToObject(jsonVw, "goalLabel" , vwArrayTotal[i]->goalLabel);
+        cJSON_AddStringToObject(jsonVw, "scLabel"   , vwArrayTotal[i]->scLabel);
+        cJSON_AddNumberToObject(jsonVw, "begin"     , vwArrayTotal[i]->begin);
+        cJSON_AddNumberToObject(jsonVw, "end"       , vwArrayTotal[i]->end);
+        if(isTargetDirCalculate){
+            cJSON_AddNumberToObject(jsonVw, "cntDir", vwArrayTotal[i]->cntDir);
+            cJSON * jsonDirArray = cJSON_AddArrayToObject(jsonVw, "dirArray");
+            for(int j=0; j<vwArrayTotal[i]->cntDir; j++){
+                cJSON * jsonDir = cJSON_CreateObject();
+                cJSON_AddNumberToObject(jsonDir, "x", vwArrayTotal[i]->dirArray[j][0]);
+                cJSON_AddNumberToObject(jsonDir, "y", vwArrayTotal[i]->dirArray[j][1]);
+                cJSON_AddNumberToObject(jsonDir, "z", vwArrayTotal[i]->dirArray[j][2]);
+                cJSON_AddItemToArray(jsonDirArray,jsonDir);
+            }
+        }
+        cJSON_AddItemToArray(jsonVwArray,jsonVw);
+    }
+    outputConsolFile(jsonVwArray,"csgViewWindow");
 }
 #endif

@@ -141,10 +141,10 @@ endif()
 if(cJSON+)
     # Support json output
     list(APPEND SOURCES
-        ../42dev/report+/cJSON/cJSON.c
+        ../42dev/cjson/cJSON.c
     )
 
-    include_directories(../42dev/report+/cJSON)
+    include_directories(../42dev/cjson/)
 endif()
 # --------------------------------------------------------------
 if(IMPLOT OR 42GUI)# include GLEW и freeglut
