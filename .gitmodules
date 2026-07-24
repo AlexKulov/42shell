@@ -7,6 +7,6 @@
 [submodule "42dev/imPlotGui/imgui"]
 	path = 42dev/imPlotGui/imgui
 	url = https://github.com/ocornut/imgui.git
-[submodule "42dev/cjson"]
-	path = 42dev/cjson
-	url = https://github.com/DaveGamble/cJSON.git
+[submodule "42dev/report+/cJSON"]
+	path = 42dev/report+/cJSON
+	url = https://github.com/DaveGamble/cJSON

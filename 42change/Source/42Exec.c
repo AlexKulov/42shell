@@ -447,7 +447,9 @@ long SimStep(void)
             printf("     Sim Speed = %8.2lf x Real\n",
                STOPTIME/TotalRunTime);
          }
-         ExtReportToFile();
+         #ifdef _CJSON_PLUS_
+         ExtReportToJsonFile();
+         #endif
       }
       return(SimComplete);
 

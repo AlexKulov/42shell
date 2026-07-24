@@ -63,7 +63,7 @@ set(BASE_SOURCES
     ../42change/Source/shActuators.c
     ../42change/Source/shFsw.c
     ../42change/Source/shIokit.c
-    ../42change/Source/shExec.c
+    ../42change/Source/42exec.c
     ../42dev/report+/Interface.c
     ../42dev/report+/ViewWindow.c
     ../42dev/report+/FlightData.c
@@ -141,10 +141,10 @@ endif()
 if(cJSON+)
     # Support json output
     list(APPEND SOURCES
-        ../42dev/cjson/cJSON.c
+        ../42dev/report+/cJSON/cJSON.c
     )
 
-    include_directories(../42dev/cjson/)
+    include_directories(../42dev/report+/cJSON/)
 endif()
 # --------------------------------------------------------------
 if(IMPLOT OR 42GUI)# include GLEW и freeglut

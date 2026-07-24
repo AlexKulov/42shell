@@ -8,7 +8,7 @@ extern "C"
 
 void initExtReport(void);
 void ExtReport(void);
-void ExtReportToFile(void);
+void ExtReportToJsonFile(void);
 
 #ifdef __cplusplus
 }

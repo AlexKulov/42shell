@@ -94,7 +94,7 @@ extern void outputViewWindow(void);
 //extern void outputScGsContact(void);
 //extern void outputScScContact(void);
 
-void ExtReportToFile(void){
+void ExtReportToJsonFile(void){
     if(isFlightDataCalculate)
         outputFlightData();
     if(isViewWindowCalculate)
