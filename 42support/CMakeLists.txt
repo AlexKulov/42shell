@@ -215,6 +215,6 @@ if(WIN32)
 endif()
 
 # Setting math lib for Linux
-if(UNIX AND 42GUI)
+if(UNIX OR 42GUI)
     target_link_libraries(${PROJECT_NAME} PRIVATE m)
 endif()
