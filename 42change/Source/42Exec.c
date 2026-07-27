@@ -76,6 +76,29 @@ void ManageFlags(void)
 
 }
 /**********************************************************************/
+static void UpdateTime(){
+    static long itime = 0;
+    SimTime += DTSIM;
+    itime = (long) ((SimTime+0.5*DTSIM)/(DTSIM));
+    SimTime = ((double) itime)*DTSIM;
+    DynTime = DynTime0 + SimTime;
+
+    AtomicTime = DynTime - 32.184; /* TAI */
+    CivilTime = AtomicTime - LeapSec; /* UTC "clock" time */
+    GpsTime = AtomicTime - 19.0;
+
+    TT.JulDay = TimeToJD(DynTime);
+    TimeToDate(DynTime,&TT.Year,&TT.Month,&TT.Day,
+               &TT.Hour,&TT.Minute,&TT.Second,DTSIM);
+    TT.doy = MD2DOY(TT.Year,TT.Month,TT.Day);
+
+    UTC.JulDay = TimeToJD(CivilTime);
+    TimeToDate(CivilTime,&UTC.Year,&UTC.Month,&UTC.Day,
+               &UTC.Hour,&UTC.Minute,&UTC.Second,DTSIM);
+    UTC.doy = MD2DOY(UTC.Year,UTC.Month,UTC.Day);
+
+    GpsTimeToGpsDate(GpsTime,&GpsRollover,&GpsWeek,&GpsSecond);
+}
 long AdvanceTime(void)
 {
       static long itime = 0;
@@ -86,52 +109,23 @@ long AdvanceTime(void)
       /* Advance time to next Timestep */
       switch (TimeMode) {
          case FAST_TIME :
-            SimTime += DTSIM;
-            itime = (long) ((SimTime+0.5*DTSIM)/(DTSIM));
-            SimTime = ((double) itime)*DTSIM;
-            DynTime = DynTime0 + SimTime;
-
-            AtomicTime = DynTime - 32.184; /* TAI */
-            CivilTime = AtomicTime - LeapSec; /* UTC "clock" time */
-            GpsTime = AtomicTime - 19.0;
-
-            TT.JulDay = TimeToJD(DynTime);
-            TimeToDate(DynTime,&TT.Year,&TT.Month,&TT.Day,
-               &TT.Hour,&TT.Minute,&TT.Second,DTSIM);
-            TT.doy = MD2DOY(TT.Year,TT.Month,TT.Day);
-
-            UTC.JulDay = TimeToJD(CivilTime);
-            TimeToDate(CivilTime,&UTC.Year,&UTC.Month,&UTC.Day,
-               &UTC.Hour,&UTC.Minute,&UTC.Second,DTSIM);
-            UTC.doy = MD2DOY(UTC.Year,UTC.Month,UTC.Day);
-
-            GpsTimeToGpsDate(GpsTime,&GpsRollover,&GpsWeek,&GpsSecond);
-
+            UpdateTime();
             break;
          case REAL_TIME :
-            usleep(1.0E6*DTSIM);
-            SimTime += DTSIM;
-            itime = (long) ((SimTime+0.5*DTSIM)/(DTSIM));
-            SimTime = ((double) itime)*DTSIM;
-            DynTime = DynTime0 + SimTime;
-
-            AtomicTime = DynTime - 32.184; /* TAI */
-            CivilTime = AtomicTime - LeapSec; /* UTC "clock" time */
-            GpsTime = AtomicTime - 19.0;
-
-            TT.JulDay = TimeToJD(DynTime);
-            TimeToDate(DynTime,&TT.Year,&TT.Month,&TT.Day,
-               &TT.Hour,&TT.Minute,&TT.Second,DTSIM);
-            TT.doy = MD2DOY(TT.Year,TT.Month,TT.Day);
-
-            UTC.JulDay = TimeToJD(CivilTime);
-            TimeToDate(CivilTime,&UTC.Year,&UTC.Month,&UTC.Day,
-               &UTC.Hour,&UTC.Minute,&UTC.Second,DTSIM);
-            UTC.doy = MD2DOY(UTC.Year,UTC.Month,UTC.Day);
-
-            GpsTimeToGpsDate(GpsTime,&GpsRollover,&GpsWeek,&GpsSecond);
-
+            if(PrevTick == 1){
+                CurrTick = (long) (1.0E-6*usec()/DTSIM);
+                PrevTick = CurrTick;
+            }
+            while(CurrTick == PrevTick) {
+                CurrTick = (long) (1.0E-6*usec()/DTSIM);
+            }
+            PrevTick++;
+            UpdateTime();
             break;
+         case SLEEP_TIME :
+             usleep(1.0E6*DTSIM);
+             UpdateTime();
+             break;
          case EXTERNAL_TIME :
             while(CurrTick == PrevTick) {
                CurrTick = (long) (1.0E-6*usec()/DTSIM);

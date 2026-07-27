@@ -31,7 +31,7 @@ typedef struct ManeuverImpulse{
 } ManeuverImpulse;
 
 typedef struct OrbitType OrbitType;
-static void CopyV(double V[3], double W[3]){
+void CopyV(double V[3], double W[3]){
     W[0] = V[0];
     W[1] = V[1];
     W[2] = V[2];
