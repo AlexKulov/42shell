@@ -16,12 +16,6 @@ extern double R2D;
 /**********************************************************************/
 /*                 Support Analys Function                            */
 
-void SUMMV(const double a[3], const double b[3], double c[3]){
-    c[0]=a[0]+b[0];
-    c[1]=a[1]+b[1];
-    c[2]=a[2]+b[2];
-}
-
 /********* lat, lng reference by degree ***************/
 static void ECIToWGS84(double PosN[3],
                 double * lat, double * lng, double * alt){
@@ -225,4 +219,39 @@ void ExcThrProcessing(struct AcType *AC, long FirstThr, long LastThr){
             W->PulseWidthCmd = 10.0;
         }
     }
+}
+/**********************************************************************/
+/*                 Support Math Function                            */
+
+void SUMMV(const double a[3], const double b[3], double c[3]){
+    c[0]=a[0]+b[0];
+    c[1]=a[1]+b[1];
+    c[2]=a[2]+b[2];
+}
+
+/**
+ * @brief Разложение вектора b на две ортогональные компоненты:
+ *        ba – проекция b на направление a,
+ *        bn – составляющая b, перпендикулярная a.
+ *
+ * @param a  указатель на массив из 3 элементов (вектор направления)
+ * @param b  указатель на массив из 3 элементов (разлагаемый вектор)
+ * @param ba выходной массив для соосной компоненты
+ * @param bn выходной массив для перпендикулярной компоненты
+ */
+void vecDecompose(const double a[3], const double b[3],
+                      double ba[3], double bn[3]){
+    // Скалярная проекция b на a
+    double proj =(b[0]*a[0] + b[1]*a[1] + b[2]*a[2])/
+                 (a[0]*a[0] + a[1]*a[1] + a[2]*a[2]);
+
+    // Соосная компонента: proj * a
+    ba[0] = proj * a[0];
+    ba[1] = proj * a[1];
+    ba[2] = proj * a[2];
+
+    // Перпендикулярная компонента: d - ba
+    bn[0] = b[0] - ba[0];
+    bn[1] = b[1] - ba[1];
+    bn[2] = b[2] - ba[2];
 }

@@ -97,7 +97,7 @@ void ToPlot(double SimTime){
             extUi->Plot11->graph(2)->addData(SimTime,modeAng[2]);
         }
         else if(true){
-            extUi->Plot11->graph(0)->addData(SimTime, modeAng[1]);
+            extUi->Plot11->graph(0)->addData(SimTime, modeAng[0]);
         }
         extUi->Plot11->rescaleAxes();
         extUi->Plot11->replot();

@@ -16,6 +16,12 @@ extern void MagnetometerProcessing(struct AcType *AC);
 extern void WheelProcessing(struct AcType *AC);
 extern void GpsProcessing(struct AcType *AC);
 
+static long i;
+/**********************************************************************/
+double modeAng[3] = {0}; //degree
+/* for one axis mode does matter modeAng[0]
+ * for LvlhMode - all angles
+ */
 struct SunModeCtrlType {
    /*~ Parameters ~*/
    double AngRateGain[3];
@@ -28,16 +34,10 @@ struct SunModeCtrlType {
 };
 
 static struct SunModeCtrlType C = {.Init=1};
-/**********************************************************************/
-double modeAng[3] = {0}; //degree
-/* for one axis mode does matter modeAng[0]
- * for LvlhMode - all angles
- */
-void EasySunMode(struct SCType *S){
+
+static void commonSunMode(struct SCType *S){
     /* .. Initialize */
-    struct AcType *AC;
-    long i;
-    AC = &S->AC;
+    struct AcType * AC = &S->AC;
     if (C.Init) {
        C.Init = 0;
        C.fvb[0]=0; C.fvb[1]=0; C.fvb[2]=1;
@@ -55,19 +55,36 @@ void EasySunMode(struct SCType *S){
     GyroProcessing(AC);
     AC->SunValid = 0; // почему-то он не обнуляется в FssProcessing
     FssProcessing(AC);
-
+    /* .. For Plot */
+    for(i=0;i<3;i++)
+        modeAng[i] = 0;
+    modeAng[0] = acos(VoV(S->svb,C.fvb))*R2D; //degree
+}
+void EasySunMode(struct SCType *S){
+    commonSunMode(S);
+    struct AcType * AC = &S->AC;
     /* .. Control Low Processing */
     VxV(AC->svb,C.fvb,C.ArgUpr);
     for(i=0;i<3;i++)
         AC->Tcmd[i] = -C.AngRateGain[i]*AC->wbn[i]
                       -C.AngGain[i]*C.ArgUpr[i];
-
     /* .. Actuator Processing */
     WheelProcessing(AC);
+}
 
+void MtbSunMode(struct SCType *S){
+    commonSunMode(S);
+    struct AcType * AC = &S->AC;
+    /* .. Control Low Processing */
+    VxV(AC->svb,C.fvb,C.ArgUpr);
     for(i=0;i<3;i++)
-        modeAng[i] = 0;
-    modeAng[0] = acos(VoV(S->svb,C.fvb))*R2D; //degree
+        AC->Tcmd[i] = -C.AngRateGain[i]*AC->wbn[i]
+                      -C.AngGain[i]*C.ArgUpr[i];
+    /* .. Actuator Processing */
+    double fvbTcmd[3] = {0};
+    double uprTcmd[3] = {0};
+    vecDecompose(C.fvb, AC->Tcmd, fvbTcmd, uprTcmd);
+
 }
 
 /**********************************************************************/

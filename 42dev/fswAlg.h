@@ -12,6 +12,8 @@ void WSG84ToECI(double lat, double lng, double alt, double PosN[3]);
 double angEarthPointNegAxis(struct SCType *S, double eartPointN[3], double bodyAxis[3]);
 
 void SUMMV(const double a[3], const double b[3], double c[3]);
+void vecDecompose(const double a[3], const double b[3],
+                      double ba[3], double bn[3]);
 void FindNWref (double ScRi[3], const double ScVi[3], const double PointRi[3],
                double nref[3], double wref[3], double dwref[3]);
 

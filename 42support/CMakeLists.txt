@@ -40,6 +40,7 @@ set(BASE_SOURCES
     ../42core/Source/42actuators.c
     ../42core/Source/42environs.c
     ../42core/Source/42ephem.c
+    ../42core/Source/42fsw.c
     ../42core/Source/42ipc.c
     ../42core/Source/42perturb.c
     ../42core/Source/42sensors.c
