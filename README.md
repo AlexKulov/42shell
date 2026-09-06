@@ -19,7 +19,7 @@ For more details, visit: https://github.com/ericstoneking/42
     |-- 42support
     |   |-- Contains freeglut and glew library
     |   |-- Contains code files (QtSource) only Qt lib (Qt5 m.b. more)
-    |   |-- Contains Qmake (with qplot) and Cmake files for build 42
+    |   |-- Contains Cmake (+ old Qmake) files for build 42
     |-- examples
     |   |-- Like 42/InOut or 42/Demo, but demo examples for 42shell repo
 	|-- img
@@ -56,11 +56,13 @@ be sure to add the compiler MinGW 32(64)-bit
   
 **Windows OS Only!!!**: Copy the DLL files from the 42support/glew and 42support/freeglut folders to the 42 folder  
 (to run the .exe file compiled in this folder)  
-**Windows/Linux (Ubuntu 18)**:  
-1) Open the 42support/42.pro file in Qt Creator, select the MinGW 32-bit compiler  
-(this is important, as the DLL files are compiled with this in mind) and click "More Details." Next, select the 42support directory  
-for all three cases and click "Configure Project."  
-** Important! The path to 42support should be latinic characters. **  
+**Windows/Linux (Ubuntu 18)**:
+***42shell use CMakeLists.txt for project, not Qmake(!)***       
+1) Open the 42support/CMakeLists.txt file in Qt Creator, select the MinGW 32-bit compiler  
+(this is important, as the DLL files are compiled with this in mind) and click "More Details."    
+Next, select the 42support/build directory  
+for all cases and click "Configure Project."  
+** Important! The path to 42support/build should be latinic characters. **  
 ![Figure 4](img/ConfigProject.jpg)  
 2) Run the project (green triangle with a bug in the lower left)  
 3) Click the "Start" button on the widget that appears  

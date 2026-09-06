@@ -31,7 +31,6 @@ set(BASE_SOURCES
     ../42core/Kit/Source/meshkit.c
     ../42core/Kit/Source/iokit.c
     ../42core/Kit/Source/mathkit.c
-    ../42core/Kit/Source/msis86kit.c
     ../42core/Kit/Source/nrlmsise00kit.c
     ../42core/Kit/Source/orbkit.c
     ../42core/Kit/Source/sigkit.c

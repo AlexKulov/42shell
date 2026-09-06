@@ -17,7 +17,6 @@
 #include "fswMode.h"
 
 extern void AcFsw(struct AcType *AC);
-//extern void WriteToSocket(SOCKET Socket, char **Prefix, long Nprefix, long EchoEnabled);
 
 /* #ifdef __cplusplus
 ** namespace _42 {
