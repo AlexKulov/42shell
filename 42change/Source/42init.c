@@ -2492,7 +2492,7 @@ void InitSpacecraft(struct SCType *S)
             fscanf(infile,"%lf %[^\n] %[\n]",&FSS->SampleTime,junk,&newline);
             FSS->MaxCounter = (long) (FSS->SampleTime/DTSIM+0.5);
             if (FSS->SampleTime < DTSIM) {
-               printf("Error:  FSS[%ld].SampleTime smaller than DTSIM.\n",Ig);
+               printf("Error:  FSS[%ld].SampleTime smaller than DTSIM.\n",Ifss);
                exit(1);
             }
             FSS->SampleCounter = FSS->MaxCounter;

@@ -180,12 +180,19 @@ void calculateViewWindow(void){
             else if(isTargetDirCalculate &&
                     isVisibleGoalByScPrev[num] && isVisibleGoalBySc[num]){
                 if(cntOut[num] >= maxCntOut){
-                    double CON[3][3] = {0};
-                    FindCON(SC[Isc].PosN,SC[Isc].VelN, CON);
+                    static char frameName = 'L';
+                    double CN[3][3] = {0};
                     double tDir[3] = {0};
                     double lGoalToScN[3] = {0};
+                    if(frameName == 'O'){
+                        FindCON(SC[Isc].PosN,SC[Isc].VelN, CN);
+                    }
+                    else{
+                        double wln[3] = {0};
+                        FindCLN(SC[Isc].PosN,SC[Isc].VelN, CN,wln);
+                    }
                     MTxV(World[EARTH].CWN, lGoalToSc, lGoalToScN);
-                    MxV(CON, lGoalToScN, tDir);
+                    MxV(CN, lGoalToScN, tDir);
                     UNITV(tDir);
                     NEGV(tDir);
                     uint8_t cntDir = vw[num].cntDir >= (DIR_SIZE-1) ? DIR_SIZE-1 : vw[num].cntDir;
@@ -196,8 +203,7 @@ void calculateViewWindow(void){
                 }
                 else
                     cntOut[num]++;
-            }
-
+            }//if(isTargetDirCalculate
             isVisibleGoalByScPrev[num]=isVisibleGoalBySc[num];
         }
 }
