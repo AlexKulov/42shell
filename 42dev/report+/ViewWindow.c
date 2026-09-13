@@ -195,10 +195,11 @@ void calculateViewWindow(void){
                     MxV(CN, lGoalToScN, tDir);
                     UNITV(tDir);
                     NEGV(tDir);
-                    uint8_t cntDir = vw[num].cntDir >= (DIR_SIZE-1) ? DIR_SIZE-1 : vw[num].cntDir;
-                    CopyUnitV(tDir, vw[num].dirArray[cntDir]);
-                    cntDir++;
-                    vw[num].cntDir = cntDir;
+                    if(vw[num].cntDir < DIR_SIZE){
+                        CopyUnitV(tDir, vw[num].dirArray[
+                        vw[num].cntDir]);
+                        vw[num].cntDir++;
+                    }
                     cntOut[num] = 0;
                 }
                 else
