@@ -37,7 +37,7 @@ static double * beginVwTime;
 static double * endVwTime;
 
 #define LABLE_SIZE (10)
-#define DIR_SIZE (20)
+#define DIR_SIZE (1000)
 typedef struct ViewWindows{
     char goalLabel[LABLE_SIZE];
     char scLabel[LABLE_SIZE];
@@ -48,7 +48,7 @@ typedef struct ViewWindows{
 }ViewWindows;
 static ViewWindows * vw;
 
-#define MAX_VW (100)
+#define MAX_VW (20)
 static uint8_t cntVw = 0;
 static ViewWindows * vwArrayTotal[MAX_VW];
 long * cntOut;
