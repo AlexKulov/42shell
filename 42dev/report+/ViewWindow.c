@@ -179,6 +179,7 @@ void calculateViewWindow(void){
             }
             else if(isTargetDirCalculate &&
                     isVisibleGoalByScPrev[num] && isVisibleGoalBySc[num]){
+                cntOut[num]++;
                 if(cntOut[num] >= maxCntOut){
                     static char frameName = 'L';
                     double CN[3][3] = {0};
@@ -202,8 +203,7 @@ void calculateViewWindow(void){
                     }
                     cntOut[num] = 0;
                 }
-                else
-                    cntOut[num]++;
+
             }//if(isTargetDirCalculate
             isVisibleGoalByScPrev[num]=isVisibleGoalBySc[num];
         }
